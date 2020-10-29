@@ -1,3 +1,7 @@
+# utils [![Build Status](https://travis-ci.org/launchql/utils.svg?branch=master)](https://travis-ci.org/launchql/utils)
+
+LaunchQL Utils
+
 # start the postgres db process
 
 First you'll want to start the postgres docker (you can also just use `docker-compose up -d`):
