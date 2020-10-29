@@ -13,7 +13,7 @@
   "command": {
     "create": {
       "license": "SEE LICENSE IN LICENSE",
-      "access": "restricted"
+      "access": "public"
     },
     "publish": {
       "allowBranch": "master"

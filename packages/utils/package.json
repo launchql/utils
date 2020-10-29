@@ -4,7 +4,7 @@
   "description": "utils",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "scripts": {
     "test": "FAST_TEST=1 launchql-templatedb && jest",
@@ -34,5 +34,6 @@
     "jest": "26.1.0",
     "prettier": "2.0.5",
     "regenerator-runtime": "^0.13.2"
-  }
+  },
+  "gitHead": "8be1bc21f0e054c389c504bfb2e4cebe958b8d92"
 }
