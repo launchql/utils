@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-types",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "types",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
