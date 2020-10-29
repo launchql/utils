@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-default-roles",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "default roles",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
@@ -35,6 +35,5 @@
     "prettier": "2.0.5",
     "regenerator-runtime": "^0.13.2"
   },
-  "gitHead": "8be1bc21f0e054c389c504bfb2e4cebe958b8d92",
-  "dependencies": []
+  "gitHead": "8be1bc21f0e054c389c504bfb2e4cebe958b8d92"
 }
