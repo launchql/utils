@@ -1,0 +1,84 @@
+[
+  {
+    "RawStmt": {
+      "stmt": {
+        "DoStmt": {
+          "args": [
+            {
+              "DefElem": {
+                "defname": "as",
+                "arg": {
+                  "String": {
+                    "str": "\n  DECLARE\n  sql text;\nBEGIN\n  SELECT\n    format('REVOKE ALL ON DATABASE %I FROM PUBLIC', current_database()) INTO sql;\n  EXECUTE sql;\nEND "
+                  }
+                },
+                "defaction": 0
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "RawStmt": {
+      "stmt": {
+        "AlterDefaultPrivilegesStmt": {
+          "action": {
+            "GrantStmt": {
+              "targtype": 2,
+              "objtype": 7,
+              "privileges": [
+                {
+                  "AccessPriv": {
+                    "priv_name": "execute"
+                  }
+                }
+              ],
+              "grantees": [
+                {
+                  "RoleSpec": {
+                    "roletype": 3
+                  }
+                }
+              ],
+              "behavior": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "RawStmt": {
+      "stmt": {
+        "GrantStmt": {
+          "targtype": 0,
+          "objtype": 10,
+          "objects": [
+            {
+              "String": {
+                "str": "public"
+              }
+            }
+          ],
+          "privileges": [
+            {
+              "AccessPriv": {
+                "priv_name": "create"
+              }
+            }
+          ],
+          "grantees": [
+            {
+              "RoleSpec": {
+                "roletype": 3
+              }
+            }
+          ],
+          "behavior": 0
+        }
+      }
+    }
+  }
+]

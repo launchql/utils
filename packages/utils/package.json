@@ -2,14 +2,14 @@
   "name": "@launchql/ext-utils",
   "version": "0.0.3",
   "description": "utils",
-  "author": "Web, Inc. <pyramation@gmail.com>",
+  "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
     "test": "FAST_TEST=1 launchql-templatedb && jest",
     "test:watch": "FAST_TEST=1 jest --watch",
-    "build": "lql package"
+    "prepare": "rm -rf ./sql/* && lql package"
   },
   "devDependencies": {
     "@babel/cli": "7.10.4",

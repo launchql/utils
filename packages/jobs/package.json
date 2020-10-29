@@ -2,14 +2,14 @@
   "name": "@launchql/ext-jobs",
   "version": "0.0.3",
   "description": "jobs",
-  "author": "Web, Inc. <pyramation@gmail.com>",
+  "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
     "test": "FAST_TEST=1 launchql-templatedb && jest",
     "test:watch": "FAST_TEST=1 jest --watch",
-    "build": "lql package"
+    "prepare": "rm -rf ./sql/* && lql package"
   },
   "devDependencies": {
     "@babel/cli": "7.10.4",
@@ -35,5 +35,7 @@
     "prettier": "2.0.5",
     "regenerator-runtime": "^0.13.2"
   },
-  "gitHead": "8be1bc21f0e054c389c504bfb2e4cebe958b8d92"
+  "dependencies": {
+    "@launchql/ext-default-roles": "0.0.3"
+  }
 }
