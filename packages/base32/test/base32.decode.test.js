@@ -119,18 +119,18 @@ cases(
     const [result] = await base32.call('decode', {
       input: opts.name
     });
-    console.log(opts.name, result);
-    // expect(result.decode).toEqual(opts.result);
-    // expect(result.decode).toMatchSnapshot();
+    expect(result.decode).toEqual(opts.result);
+    expect(result.decode).toMatchSnapshot();
   },
   [
-    // { result: '', name: '' },
+    { result: '', name: '' },
     { result: 'Cat', name: 'INQXI' },
-    // { result: 'f', name: 'MY======' },
-    // { result: 'fo', name: 'MZXQ====' },
-    { result: 'foo', name: 'MZXW6===' }
-    // { result: 'foob', name: 'MZXW6YQ=' },
-    // { result: 'fooba', name: 'MZXW6YTB' },
-    // { result: 'foobar', name: 'MZXW6YTBOI======' }
+    { result: 'chemistryisgreat', name: 'MNUGK3LJON2HE6LJONTXEZLBOQ======' },
+    { result: 'f', name: 'MY======' },
+    { result: 'fo', name: 'MZXQ====' },
+    { result: 'foo', name: 'MZXW6===' },
+    { result: 'foob', name: 'MZXW6YQ=' },
+    { result: 'fooba', name: 'MZXW6YTB' },
+    { result: 'foobar', name: 'MZXW6YTBOI======' }
   ]
 );

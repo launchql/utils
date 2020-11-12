@@ -120,7 +120,7 @@ LANGUAGE 'plpgsql' IMMUTABLE;
 
 CREATE FUNCTION base32.decode(
   input text
-) returns int[] as $$
+) returns text as $$
 DECLARE
   i int;
   arr int[];
@@ -133,7 +133,7 @@ DECLARE
   index int = 0;
   bits int = 0;
 BEGIN
-  input = replace(input, '=+$', '');
+  input = replace(input, '=', '');
   len = character_length(input);
   num = len * 5 / 8;
 
@@ -141,24 +141,42 @@ BEGIN
     RETURN '';
   END IF;
 
-  -- select array(select * from generate_series(1,num))
-  select array(select * from generate_series(1,num-1))
+  select array(select * from generate_series(1,num))
   INTO arr;
   
   FOR i IN 1 .. len LOOP
     value = (value << 5) | base32.base32_alphabet_to_decimal_int(substring(input from i for 1));
     bits = bits + 5;
-
     IF (bits >= 8) THEN
       -- arr[index] = (value >>> (bits - 8)) & 255;
       arr[index] = base32.zero_fill(value, (bits - 8)) & 255;
       index = index + 1;
       bits = bits - 8;
     END IF;
-
   END LOOP;
 
-  RETURN arr;
+  -- clean out bad stuff
+  -- and then always ends on number equal to the length 
+  -- e.g. Cat => [ 67, 97, 116, 3 ] 3 = length (and is in the last position)
+  -- e.g. foo =>  [ 102, 111, 111, 3 ] 
+
+  -- TODO WTF??? why does range (0, n-1) work? shouldn't it be 1-n???
+  -- Postgres arrays are 1-based by default. And in typical applications it's best to stick with the default. 
+  -- ****** But the syntax allows to start with any integer number
+  --  WHEN YOU DID THIS ABOVE ^^ arr[index] = base32.zero_fill(value, (bits - 8)) & 255;
+  -- YOU LEVERAGED feature of being able to have i = 0
+
+  len = cardinality(arr);
+  FOR i IN 0 .. len-2 LOOP
+    --  output = array_append(output, i::text);
+    --  output = array_append(output, ':[ ');
+    --  output = array_append(output, arr[i]::text);
+    --  output = array_append(output, '] ');
+    --  output = array_append(output, '\n');
+     output = array_append(output, chr(arr[i]));
+  END LOOP;
+
+  RETURN array_to_string(output, '');
 END;
 $$
 LANGUAGE 'plpgsql' STABLE;
