@@ -1,4 +1,4 @@
-# utils [![Build Status](https://travis-ci.org/launchql/utils.svg?branch=master)](https://travis-ci.org/launchql/utils)
+# utils [![Build Status](https://travis-ci.com/launchql/utils.svg?branch=master)](https://travis-ci.com/launchql/utils)
 
 LaunchQL Utils
 
