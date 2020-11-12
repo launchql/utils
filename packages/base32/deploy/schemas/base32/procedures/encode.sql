@@ -7,6 +7,21 @@
 
 BEGIN;
 
+ -- '01000011' => 67
+CREATE FUNCTION base32.binary_to_int(
+  input text
+) returns int as $$
+DECLARE
+  i int;
+  buf text;
+BEGIN
+    buf = 'SELECT B''' || input || '''::int';
+    EXECUTE buf INTO i;
+    RETURN i;
+END;
+$$
+LANGUAGE 'plpgsql' IMMUTABLE;
+
  -- ASCII decimal values Cat => [67,97,116]
 CREATE FUNCTION base32.to_ascii(
   input text
@@ -145,7 +160,6 @@ DECLARE
   i int;
   output text[];
   chunk text;
-  ichunk int;
   buf text;
   len int = cardinality(input);
 BEGIN
@@ -154,9 +168,7 @@ BEGIN
     IF (chunk ~* '[x]+') THEN 
       chunk = '=';
     ELSE
-      buf = 'SELECT B''' || input[i] || '''::int';
-      EXECUTE buf INTO ichunk;
-      chunk = ichunk::text;
+      chunk = base32.binary_to_int(input[i])::text;
     END IF;
     output = array_append(output, chunk);
   END LOOP;
