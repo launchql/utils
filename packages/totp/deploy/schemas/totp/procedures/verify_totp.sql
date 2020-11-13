@@ -4,14 +4,22 @@
 -- requires: schemas/totp/procedures/generate_totp_time_key
 
 BEGIN;
-CREATE FUNCTION totp.verify_totp (totp_secret text, totp_interval int, totp_length int, check_totp text, time_from timestamptz DEFAULT NOW())
+CREATE FUNCTION totp.verify_totp (
+  totp_secret text,
+  totp_interval int,
+  totp_length int,
+  check_totp text,
+  time_from timestamptz DEFAULT NOW(),
+  algo text default 'sha1'
+)
   RETURNS boolean
   AS $$
-  SELECT totp.generate_totp (
+  SELECT totp.generate_totp_token (
     totp_secret,
     totp_interval,
     totp_length,
-    time_from) = check_totp;
+    time_from,
+    algo) = check_totp;
 $$
 LANGUAGE 'sql';
 COMMIT;

@@ -1,7 +1,4 @@
 import { getConnections } from './utils';
-// import speakeasy from 'speakeasy';
-// import { totp as gentotp } from './utils/util';
-import { otp } from './utils/attempt2';
 
 let db, totp, teardown;
 const objs = {
@@ -33,19 +30,18 @@ afterEach(async () => {
 describe('TOTP', () => {
   describe('generate TOTP', () => {
     it('generates secrets', async () => {
-      const _secret = await db.one(
+      const secrets = await db.one(
         `
         SELECT * FROM totp.random_base32($1)
       `,
         [16]
       );
-      console.log('generates secrets', _secret);
-      expect(_secret).toBeTruthy();
+      expect(secrets).toBeTruthy();
     });
     it('interval TOTP', async () => {
       const [{ interval }] = await db.any(
         `
-        SELECT * FROM totp.generate_totp($1) as interval
+        SELECT * FROM totp.generate_totp_token($1) as interval
         `,
         ['vmlhl2knm27eftq7']
       );
@@ -65,46 +61,19 @@ describe('TOTP', () => {
     it('TOTP', async () => {
       const [{ totp }] = await db.any(
         `
-        SELECT * FROM totp.generate_totp($1, $2, $3, $4) as totp
+        SELECT * FROM totp.generate_totp_token($1, $2, $3, $4) as totp
       `,
         ['vmlhl2knm27eftq7', 30, 6, '2020-02-05 22:11:40.56915+00']
       );
-
-      // console.log({ totp });
-      // console.log({ totp });
-
-      // const result = gentotp({ secret: '12345678901234567890', time: 59 });
-      // console.log({ result });
-      // console.log({ result });
-
-      // console.log(speakeasy.digest());
-      // expect(totp).toEqual('843386');
-      expect(totp).toEqual('367269');
-    });
-    it('TOTP', async () => {
-      // const [results] = await totp.call('byte_secret', {
-      //   secret: '12345678901234567890'
-      // });
-      const [results] = await db.any(
-        `
-        SELECT * FROM totp.gtotp($1, $2) as totp
-      `,
-        ['12345678901234567890', 59]
-      );
-
-      // console.log({ results });
-      // console.log({ results });
-
-      const result = otp('JBSWY3DPEHPK3PXP');
-      console.log(result);
-      console.log(result);
+      expect(totp).toEqual('437429');
     });
     it('validation', async () => {
       const [{ verified }] = await db.any(
         `
         SELECT * FROM totp.verify_totp($1, $2, $3, $4, $5) as verified
       `,
-        ['vmlhl2knm27eftq7', 30, 6, '367269', '2020-02-05 22:11:40.56915+00']
+        ['vmlhl2knm27eftq7', 30, 6, '437429', '2020-02-05 22:11:40.56915+00']
+        // ['vmlhl2knm27eftq7', 30, 6, '843386', '2020-02-05 22:11:40.56915+00']
         // ['vmlhl2knm27eftq7', 30, 6, '843386', '2020-02-05 22:11:40.56915+00']
       );
       expect(verified).toBe(true);
@@ -132,9 +101,9 @@ describe('TOTP', () => {
     it('time-based validation wont verify in test', async () => {
       const [{ verified }] = await db.any(
         `
-        SELECT * FROM totp.verify_totp($1, $2, $3, $4, $5) as verified
+        SELECT * FROM totp.verify_totp($1, $2, $3, $4) as verified
       `,
-        ['vmlhl2knm27eftq7', 30, 6, '843386', null]
+        ['vmlhl2knm27eftq7', 30, 6, '843386']
       );
       expect(verified).toBe(false);
     });

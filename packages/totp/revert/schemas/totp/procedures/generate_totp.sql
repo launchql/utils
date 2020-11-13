@@ -2,6 +2,6 @@
 
 BEGIN;
 
-DROP FUNCTION totp.generate_totp;
+-- DROP FUNCTION totp.generate_totp;
 
 COMMIT;

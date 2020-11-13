@@ -97,7 +97,6 @@ it('N_hex tp 8 byte array', async () => {
       `,
     [51464208]
   );
-  console.log(result);
 });
 
 it('convert base32 secret into 20 bytes', async () => {
@@ -182,7 +181,6 @@ it('apply_binary_to_bytes', async () => {
       `,
     [[246, 167, 248, 153]]
   );
-  console.log(apply_binary_to_bytes);
   expect(apply_binary_to_bytes).toEqual([118, 167, 248, 153]);
   expect(apply_binary_to_bytes).toEqual([0x76, 0xa7, 0xf8, 0x99]);
   // 0x76a7f899
@@ -237,7 +235,7 @@ it('generate_totp_token', async () => {
         time_from := $2
         )
       `,
-    ['12345678901234567890', '1970-01-01 00:00:59']
+    ['Hello!Þ­¾ï', new Date()]
   );
   console.log(generate_totp_token);
 });
@@ -252,10 +250,11 @@ cases(
                 totp_secret := $1,
                 totp_interval := 30,
                 totp_length := $2,
-                time_from := $3
+                time_from := $3,
+                algo := $4
                 )
               `,
-      ['12345678901234567890', opts.len, opts.date]
+      ['12345678901234567890', opts.len, opts.date, opts.algo]
     );
     expect(generate_totp_token).toEqual(opts.result);
     expect(generate_totp_token).toMatchSnapshot();
@@ -265,32 +264,97 @@ cases(
     {
       date: '1970-01-01 00:00:59',
       len: 8,
+      algo: 'sha1',
       result: '94287082'
     },
     {
       date: '2005-03-18 01:58:29',
       len: 8,
+      algo: 'sha1',
       result: '07081804'
     },
     {
       date: '2005-03-18 01:58:31',
       len: 8,
+      algo: 'sha1',
       result: '14050471'
     },
     {
       date: '2009-02-13 23:31:30',
       len: 8,
+      algo: 'sha1',
       result: '89005924'
     },
     {
       date: '2033-05-18 03:33:20',
       len: 8,
+      algo: 'sha1',
       result: '69279037'
     },
     {
       date: '2603-10-11 11:33:20',
       len: 8,
+      algo: 'sha1',
       result: '65353130'
     }
   ]
 );
+
+// cases(
+//   'rfc6238 sha256',
+//   async (opts) => {
+//     const { generate_totp_token } = await db.one(
+//       `
+//             SELECT  totp.generate_totp_token(
+//                 totp_secret := $1,
+//                 totp_interval := 30,
+//                 totp_length := $2,
+//                 time_from := $3,
+//                 algo := $4
+//                 )
+//               `,
+//       ['12345678901234567890', opts.len, opts.date, opts.algo]
+//     );
+//     expect(generate_totp_token).toEqual(opts.result);
+//     expect(generate_totp_token).toMatchSnapshot();
+//   },
+//   [
+//     // https://tools.ietf.org/html/rfc6238
+//     {
+//       date: '1970-01-01 00:00:59',
+//       len: 8,
+//       algo: 'sha256',
+//       result: '94287082'
+//     },
+//     {
+//       date: '2005-03-18 01:58:29',
+//       len: 8,
+//       algo: 'sha256',
+//       result: '07081804'
+//     },
+//     {
+//       date: '2005-03-18 01:58:31',
+//       len: 8,
+//       algo: 'sha256',
+//       result: '14050471'
+//     },
+//     {
+//       date: '2009-02-13 23:31:30',
+//       len: 8,
+//       algo: 'sha256',
+//       result: '89005924'
+//     },
+//     {
+//       date: '2033-05-18 03:33:20',
+//       len: 8,
+//       algo: 'sha256',
+//       result: '69279037'
+//     },
+//     {
+//       date: '2603-10-11 11:33:20',
+//       len: 8,
+//       algo: 'sha256',
+//       result: '65353130'
+//     }
+//   ]
+// );
