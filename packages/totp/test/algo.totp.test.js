@@ -383,3 +383,64 @@ cases(
 //     }
 //   ]
 // );
+
+cases(
+  'speakeasy test',
+  async (opts) => {
+    const { generate_totp_token } = await db.one(
+      `
+            SELECT  totp.generate_totp_token(
+                totp_secret := $1,
+                totp_interval := $5,
+                totp_length := $2,
+                time_from := $3,
+                algo := $4
+                )
+              `,
+      ['12345678901234567890', opts.len, opts.date, opts.algo, opts.step]
+    );
+    expect(generate_totp_token).toEqual(opts.result);
+    expect(generate_totp_token).toMatchSnapshot();
+  },
+  [
+    {
+      date: '1970-01-01 00:00:59',
+      len: 6,
+      step: 30,
+      algo: 'sha1',
+      result: '287082'
+    },
+    {
+      date: '2005-03-18 01:58:29',
+      len: 6,
+      step: 30,
+      algo: 'sha1',
+      result: '081804'
+    },
+    {
+      date: '2005-03-18 01:58:29',
+      len: 6,
+      step: 60, // 60 seconds!
+      algo: 'sha1',
+      result: '360094'
+    }
+    // {
+    //   date: '2009-02-13 23:31:30',
+    //   len: 8,
+    //   algo: 'sha1',
+    //   result: '89005924'
+    // },
+    // {
+    //   date: '2033-05-18 03:33:20',
+    //   len: 8,
+    //   algo: 'sha1',
+    //   result: '69279037'
+    // },
+    // {
+    //   date: '2603-10-11 11:33:20',
+    //   len: 8,
+    //   algo: 'sha1',
+    //   result: '65353130'
+    // }
+  ]
+);
