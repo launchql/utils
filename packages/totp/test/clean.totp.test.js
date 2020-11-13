@@ -1,4 +1,5 @@
 import { getConnections } from './utils';
+import cases from 'jest-in-case';
 
 let db, totp, teardown;
 const objs = {
@@ -37,7 +38,25 @@ it('T_unix', async () => {
       `,
     [time]
   );
-  expect(t_unix).toEqual(1543926260);
+  expect(t_unix).toEqual('1543926260');
+});
+it('T_unix', async () => {
+  const { t_unix } = await db.one(
+    `
+        SELECT totp.t_unix($1::timestamptz)
+          `,
+    ['1970-01-01 00:00:59']
+  );
+  expect(t_unix).toEqual('59');
+});
+it('T_unix', async () => {
+  const { t_unix } = await db.one(
+    `
+        SELECT totp.t_unix($1::timestamptz)
+          `,
+    ['2603-10-11 11:33:20']
+  );
+  expect(t_unix).toEqual('20000000000');
 });
 
 it('N', async () => {
@@ -52,7 +71,7 @@ it('N', async () => {
       `,
     [time, steps]
   );
-  expect(n).toEqual(51464208);
+  expect(n).toEqual('51464208');
 });
 
 it('N_hex', async () => {
@@ -207,3 +226,71 @@ it('calculate_token', async () => {
   );
   expect(calculate_token).toEqual('9641');
 });
+
+it('generate_totp_token', async () => {
+  const { generate_totp_token } = await db.one(
+    `
+    SELECT  totp.generate_totp_token(
+        totp_secret := $1,
+        totp_interval := 30,
+        totp_length := 6,
+        time_from := $2
+        )
+      `,
+    ['12345678901234567890', '1970-01-01 00:00:59']
+  );
+  console.log(generate_totp_token);
+});
+// ['vmlhl2knm27eftq7', 30, 6, '843386', '2020-02-05 22:11:40.56915+00']
+
+cases(
+  'rfc6238',
+  async (opts) => {
+    const { generate_totp_token } = await db.one(
+      `
+            SELECT  totp.generate_totp_token(
+                totp_secret := $1,
+                totp_interval := 30,
+                totp_length := $2,
+                time_from := $3
+                )
+              `,
+      ['12345678901234567890', opts.len, opts.date]
+    );
+    expect(generate_totp_token).toEqual(opts.result);
+    expect(generate_totp_token).toMatchSnapshot();
+  },
+  [
+    // https://tools.ietf.org/html/rfc6238
+    {
+      date: '1970-01-01 00:00:59',
+      len: 8,
+      result: '94287082'
+    },
+    {
+      date: '2005-03-18 01:58:29',
+      len: 8,
+      result: '07081804'
+    },
+    {
+      date: '2005-03-18 01:58:31',
+      len: 8,
+      result: '14050471'
+    },
+    {
+      date: '2009-02-13 23:31:30',
+      len: 8,
+      result: '89005924'
+    },
+    {
+      date: '2033-05-18 03:33:20',
+      len: 8,
+      result: '69279037'
+    },
+    {
+      date: '2603-10-11 11:33:20',
+      len: 8,
+      result: '65353130'
+    }
+  ]
+);

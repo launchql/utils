@@ -18,19 +18,19 @@ BEGIN;
 CREATE FUNCTION totp.t_unix (
   timestamptz
 )
-  RETURNS int
+  RETURNS bigint
   AS $$
-SELECT floor(EXTRACT(epoch FROM $1))::int;
+SELECT floor(EXTRACT(epoch FROM $1))::bigint;
 $$
 LANGUAGE sql IMMUTABLE;
 
 CREATE FUNCTION totp.n (
   t timestamptz,
-  step int default 30
+  step bigint default 30
 )
-  RETURNS int
+  RETURNS bigint
   AS $$
-SELECT floor(totp.t_unix(t) / step)::int;
+SELECT floor(totp.t_unix(t) / step)::bigint;
 $$
 LANGUAGE sql IMMUTABLE;
 
@@ -208,10 +208,73 @@ $$
 LANGUAGE 'plpgsql' IMMUTABLE;
 
 
+CREATE FUNCTION totp.generate_totp_token (
+  totp_secret text,
+  totp_interval int default 30,
+  totp_length int default 6,
+  time_from timestamptz DEFAULT NOW()
+) returns text as $$
+DECLARE 
+  v_bytes_int int;
+  n int;
+  v_hmc bytea;
+  v_offset int;
+
+  v_secret bytea;
+BEGIN
+  n = totp.n(
+    time_from,
+    totp_interval
+  );
+
+  -- v_secret = base32.decode(totp_secret)::bytea;
+  -- v_secret = base32.encode(totp_secret)::bytea;
+  v_secret = totp_secret::bytea;
+
+  v_hmc = totp.hmac_as_20_bytes( 
+    totp.n_hex_to_8_bytes(
+      totp.n_hex(n)
+    ),
+    v_secret
+  );
+
+  v_offset = totp.get_offset(
+    v_hmc
+  );
+
+  v_bytes_int = totp.compact_bytes_to_int( 
+    totp.apply_binary_to_bytes(
+      totp.get_first_4_bytes_from_offset(
+        v_hmc,
+        v_offset
+      )
+    )
+  );
+
+  RETURN totp.calculate_token(
+    v_bytes_int,
+    totp_length
+  );
+
+END;
+$$
+LANGUAGE 'plpgsql' IMMUTABLE;
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+-- OTHER ATTEMPTS BELOW
 
 
 CREATE FUNCTION totp.counter (
