@@ -237,10 +237,35 @@ it('generate_totp_token', async () => {
       `,
     ['Hello!Þ­¾ï', new Date()]
   );
-  console.log(generate_totp_token);
+  const { generate_totp_token: second } = await db.one(
+    `
+    SELECT  totp.generate_totp_token(
+        totp_secret := $1,
+        totp_interval := 30,
+        totp_length := 6,
+        time_from := $2
+        )
+      `,
+    ['jbswy3dpehpk3pxp', new Date()]
+  );
+  const [{ key }] = await db.any(
+    `
+        SELECT * FROM totp.generate_totp_time_key($1, $2) as key
+        `,
+    [30, new Date()]
+  );
+  // TODO test against this
+  // http://blog.tinisles.com/2011/10/google-authenticator-one-time-password-algorithm-in-javascript/
+  console.log({ generate_totp_token, time_key: key });
+  console.log({ second, time_key: key });
 });
 // ['vmlhl2knm27eftq7', 30, 6, '843386', '2020-02-05 22:11:40.56915+00']
 
+// 070521
+// 382234
+
+// 665163
+// 157401
 cases(
   'rfc6238',
   async (opts) => {
