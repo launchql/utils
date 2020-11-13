@@ -1,4 +1,7 @@
 import { getConnections } from './utils';
+// import speakeasy from 'speakeasy';
+// import { totp as gentotp } from './utils/util';
+import { otp } from './utils/attempt2';
 
 let db, totp, teardown;
 const objs = {
@@ -46,7 +49,7 @@ describe('TOTP', () => {
         `,
         ['vmlhl2knm27eftq7']
       );
-      console.log('interval TOTP', interval);
+      // console.log('interval TOTP', interval);
       expect(interval).toBeTruthy();
     });
     it('timekey', async () => {
@@ -56,7 +59,7 @@ describe('TOTP', () => {
           `,
         [30, '2020-02-05 22:11:40.56915+00']
       );
-      console.log(key, 'timekey');
+      // console.log(key, 'timekey');
       expect(key).toEqual('0000000003241ba7');
     });
     it('TOTP', async () => {
@@ -66,14 +69,43 @@ describe('TOTP', () => {
       `,
         ['vmlhl2knm27eftq7', 30, 6, '2020-02-05 22:11:40.56915+00']
       );
-      expect(totp).toEqual('843386');
+
+      // console.log({ totp });
+      // console.log({ totp });
+
+      // const result = gentotp({ secret: '12345678901234567890', time: 59 });
+      // console.log({ result });
+      // console.log({ result });
+
+      // console.log(speakeasy.digest());
+      // expect(totp).toEqual('843386');
+      expect(totp).toEqual('367269');
+    });
+    it('TOTP', async () => {
+      // const [results] = await totp.call('byte_secret', {
+      //   secret: '12345678901234567890'
+      // });
+      const [results] = await db.any(
+        `
+        SELECT * FROM totp.gtotp($1, $2) as totp
+      `,
+        ['12345678901234567890', 59]
+      );
+
+      // console.log({ results });
+      // console.log({ results });
+
+      const result = otp('JBSWY3DPEHPK3PXP');
+      console.log(result);
+      console.log(result);
     });
     it('validation', async () => {
       const [{ verified }] = await db.any(
         `
         SELECT * FROM totp.verify_totp($1, $2, $3, $4, $5) as verified
       `,
-        ['vmlhl2knm27eftq7', 30, 6, '843386', '2020-02-05 22:11:40.56915+00']
+        ['vmlhl2knm27eftq7', 30, 6, '367269', '2020-02-05 22:11:40.56915+00']
+        // ['vmlhl2knm27eftq7', 30, 6, '843386', '2020-02-05 22:11:40.56915+00']
       );
       expect(verified).toBe(true);
     });
