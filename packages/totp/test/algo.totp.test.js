@@ -403,6 +403,7 @@ cases(
     expect(generate_totp_token).toMatchSnapshot();
   },
   [
+    // https://github.com/speakeasyjs/speakeasy/blob/master/test/totp_test.js
     {
       date: '1970-01-01 00:00:59',
       len: 6,
