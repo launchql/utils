@@ -225,10 +225,10 @@ it('calculate_token', async () => {
   expect(calculate_token).toEqual('9641');
 });
 
-it('generate_totp_token', async () => {
-  const { generate_totp_token } = await db.one(
+it('generate', async () => {
+  const { generate } = await db.one(
     `
-    SELECT  totp.generate_totp_token(
+    SELECT  totp.generate(
         totp_secret := $1,
         totp_interval := 30,
         totp_length := 6,
@@ -237,9 +237,9 @@ it('generate_totp_token', async () => {
       `,
     ['Hello!Þ­¾ï', new Date()]
   );
-  const { generate_totp_token: second } = await db.one(
+  const { generate: second } = await db.one(
     `
-    SELECT  totp.generate_totp_token(
+    SELECT  totp.generate(
         totp_secret := $1,
         totp_interval := 30,
         totp_length := 6,
@@ -256,7 +256,7 @@ it('generate_totp_token', async () => {
   );
   // TODO test against this
   // http://blog.tinisles.com/2011/10/google-authenticator-one-time-password-algorithm-in-javascript/
-  console.log({ generate_totp_token, time_key: key });
+  console.log({ generate, time_key: key });
   console.log({ second, time_key: key });
 });
 // ['vmlhl2knm27eftq7', 30, 6, '843386', '2020-02-05 22:11:40.56915+00']
@@ -269,9 +269,9 @@ it('generate_totp_token', async () => {
 cases(
   'rfc6238',
   async (opts) => {
-    const { generate_totp_token } = await db.one(
+    const { generate } = await db.one(
       `
-            SELECT  totp.generate_totp_token(
+            SELECT  totp.generate(
                 totp_secret := $1,
                 totp_interval := 30,
                 totp_length := $2,
@@ -281,8 +281,8 @@ cases(
               `,
       ['12345678901234567890', opts.len, opts.date, opts.algo]
     );
-    expect(generate_totp_token).toEqual(opts.result);
-    expect(generate_totp_token).toMatchSnapshot();
+    expect(generate).toEqual(opts.result);
+    expect(generate).toMatchSnapshot();
   },
   [
     // https://tools.ietf.org/html/rfc6238
@@ -328,9 +328,9 @@ cases(
 // cases(
 //   'rfc6238 sha256',
 //   async (opts) => {
-//     const { generate_totp_token } = await db.one(
+//     const { generate } = await db.one(
 //       `
-//             SELECT  totp.generate_totp_token(
+//             SELECT  totp.generate(
 //                 totp_secret := $1,
 //                 totp_interval := 30,
 //                 totp_length := $2,
@@ -340,8 +340,8 @@ cases(
 //               `,
 //       ['12345678901234567890', opts.len, opts.date, opts.algo]
 //     );
-//     expect(generate_totp_token).toEqual(opts.result);
-//     expect(generate_totp_token).toMatchSnapshot();
+//     expect(generate).toEqual(opts.result);
+//     expect(generate).toMatchSnapshot();
 //   },
 //   [
 //     // https://tools.ietf.org/html/rfc6238
@@ -387,9 +387,9 @@ cases(
 cases(
   'speakeasy test',
   async (opts) => {
-    const { generate_totp_token } = await db.one(
+    const { generate } = await db.one(
       `
-            SELECT  totp.generate_totp_token(
+            SELECT  totp.generate(
                 totp_secret := $1,
                 totp_interval := $5,
                 totp_length := $2,
@@ -399,8 +399,8 @@ cases(
               `,
       ['12345678901234567890', opts.len, opts.date, opts.algo, opts.step]
     );
-    expect(generate_totp_token).toEqual(opts.result);
-    expect(generate_totp_token).toMatchSnapshot();
+    expect(generate).toEqual(opts.result);
+    expect(generate).toMatchSnapshot();
   },
   [
     // https://github.com/speakeasyjs/speakeasy/blob/master/test/totp_test.js
@@ -452,8 +452,8 @@ cases(
     const [
       { verified }
     ] = await db.any(
-      `SELECT * FROM totp.verify_totp($1, $2, $3, $4, $5) as verified`,
-      ['12345678901234567890', opts.step, opts.len, opts.result, opts.date]
+      `SELECT * FROM totp.verify($1, $2, $3, $4, $5) as verified`,
+      ['12345678901234567890', opts.result, opts.step, opts.len, opts.date]
     );
     expect(verified).toBe(true);
   },

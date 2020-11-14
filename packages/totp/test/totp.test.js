@@ -34,7 +34,7 @@ it('generates secrets', async () => {
 it('interval TOTP', async () => {
   const [
     { interval }
-  ] = await db.any(`SELECT * FROM totp.generate_totp_token($1) as interval`, [
+  ] = await db.any(`SELECT * FROM totp.generate($1) as interval`, [
     'vmlhl2knm27eftq7'
   ]);
   // console.log('interval TOTP', interval);
@@ -53,16 +53,18 @@ it('timekey', async () => {
 it('TOTP', async () => {
   const [
     { totp }
-  ] = await db.any(
-    `SELECT * FROM totp.generate_totp_token($1, $2, $3, $4) as totp`,
-    ['vmlhl2knm27eftq7', 30, 6, '2020-02-05 22:11:40.56915+00']
-  );
+  ] = await db.any(`SELECT * FROM totp.generate($1, $2, $3, $4) as totp`, [
+    'vmlhl2knm27eftq7',
+    30,
+    6,
+    '2020-02-05 22:11:40.56915+00'
+  ]);
   expect(totp).toEqual('437429');
 });
 it('validation', async () => {
   const [{ verified }] = await db.any(
-    `SELECT * FROM totp.verify_totp($1, $2, $3, $4, $5) as verified`,
-    ['vmlhl2knm27eftq7', 30, 6, '437429', '2020-02-05 22:11:40.56915+00']
+    `SELECT * FROM totp.verify($1, $2, $3, $4, $5) as verified`,
+    ['vmlhl2knm27eftq7', '437429', 30, 6, '2020-02-05 22:11:40.56915+00']
     // ['vmlhl2knm27eftq7', 30, 6, '843386', '2020-02-05 22:11:40.56915+00']
     // ['vmlhl2knm27eftq7', 30, 6, '843386', '2020-02-05 22:11:40.56915+00']
   );
@@ -80,7 +82,7 @@ it('URL Encode', async () => {
 it('URLs', async () => {
   const [{ url }] = await db.any(
     `
-        SELECT * FROM totp.totp_url($1, $2, $3, $4) as url
+        SELECT * FROM totp.url($1, $2, $3, $4) as url
       `,
     ['dude@example.com', 'vmlhl2knm27eftq7', 30, 'acme']
   );
@@ -91,9 +93,9 @@ it('URLs', async () => {
 it('time-based validation wont verify in test', async () => {
   const [{ verified }] = await db.any(
     `
-        SELECT * FROM totp.verify_totp($1, $2, $3, $4) as verified
+        SELECT * FROM totp.verify($1, $2, $3, $4) as verified
       `,
-    ['vmlhl2knm27eftq7', 30, 6, '843386']
+    ['vmlhl2knm27eftq7', '843386', 30, 6]
   );
   expect(verified).toBe(false);
 });

@@ -1,6 +1,6 @@
 -- Deploy schemas/totp/procedures/generate_totp to pg
 -- requires: schemas/totp/schema
--- requires: schemas/totp/procedures/generate_totp_time_key
+-- requires: schemas/totp/procedures/urlencode
 
 BEGIN;
 
@@ -27,9 +27,8 @@ SELECT floor(totp.t_unix(t) / step)::bigint;
 $$
 LANGUAGE sql IMMUTABLE;
 
--- TODO use generate_totp_time_key instead
 CREATE FUNCTION totp.n_hex (
-  n int
+  n bigint
 )
   RETURNS text
   AS $$
@@ -37,15 +36,22 @@ DECLARE
  missing_padding int;
  hext text;
 BEGIN
-    hext = to_hex(n);
-    missing_padding = character_length(hext) % 16;
-    if missing_padding != 0 THEN
-      hext = lpad('', (16 - missing_padding), '0') || hext;
-    END IF;
-  RETURN hext;
+  hext = to_hex(n);
+  RETURN lpad(hext, 16, '0');
 END;
 $$
 LANGUAGE plpgsql
+IMMUTABLE;
+
+CREATE FUNCTION totp.generate_totp_time_key (
+  totp_interval int DEFAULT 30,
+  from_time timestamptz DEFAULT NOW()
+)
+  RETURNS text
+  AS $$
+  SELECT totp.n_hex( totp.n ( from_time, totp_interval ) );
+$$
+LANGUAGE 'sql'
 IMMUTABLE;
 
  -- '0000000003114810' -> '\x0000000003114810'::bytea
@@ -203,7 +209,7 @@ $$
 LANGUAGE 'plpgsql' IMMUTABLE;
 
 
-CREATE FUNCTION totp.generate_totp_token (
+CREATE FUNCTION totp.generate (
   totp_secret text,
   totp_interval int default 30,
   totp_length int default 6,
@@ -254,6 +260,34 @@ BEGIN
 END;
 $$
 LANGUAGE 'plpgsql' IMMUTABLE;
+
+CREATE FUNCTION totp.verify (
+  totp_secret text,
+  check_totp text,
+  totp_interval int default 30,
+  totp_length int default 6,
+  time_from timestamptz DEFAULT NOW(),
+  algo text default 'sha1'
+)
+  RETURNS boolean
+  AS $$
+  SELECT totp.generate (
+    totp_secret,
+    totp_interval,
+    totp_length,
+    time_from,
+    algo) = check_totp;
+$$
+LANGUAGE 'sql';
+
+CREATE FUNCTION totp.url (email text, totp_secret text, totp_interval int, totp_issuer text)
+  RETURNS text
+  AS $$
+  SELECT
+    concat('otpauth://totp/', totp.urlencode (email), '?secret=', totp.urlencode (totp_secret), '&period=', totp.urlencode (totp_interval::text), '&issuer=', totp.urlencode (totp_issuer));
+$$
+LANGUAGE 'sql'
+STRICT IMMUTABLE;
 
 COMMIT;
 

@@ -4,6 +4,9 @@
 
 BEGIN;
 
+-- THIS FILE IS WIP, not yet used. 
+-- currently, the string-based version is all that works currently
+
 CREATE FUNCTION base32.string_to_bytea(
   input text
 ) returns bytea as $$

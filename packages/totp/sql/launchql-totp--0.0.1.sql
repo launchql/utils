@@ -1,30 +1,36 @@
 \echo Use "CREATE EXTENSION launchql-totp" to load this file. \quit
 CREATE SCHEMA totp;
 
-CREATE FUNCTION totp.chars2bits ( _secret text ) RETURNS text AS $EOFCODE$
+CREATE FUNCTION totp.urlencode ( in_str text ) RETURNS text AS $EOFCODE$
 DECLARE
-    _buffer      text := '';
+  _i int4;
+  _temp varchar;
+  _ascii int4;
+  _result text := '';
 BEGIN
-
-    with chars2bits AS (
-        select
-            character,
-            (index - 1)::bit(5)::text AS index
-        from unnest('{a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,2,3,4,5,6,7}'::text[]) with ordinality as t (character, index)
-    )
-    select string_agg(c.index, '') INTO _buffer
-    from regexp_split_to_table(_secret, '') s
-    inner join chars2bits c ON (s = c.character);
-    
-    return _buffer;
-
+  FOR _i IN 1..length(in_str)
+  LOOP
+    _temp := substr(in_str, _i, 1);
+    IF _temp ~ '[0-9a-zA-Z:/@._?#-]+' THEN
+      _result := _result || _temp;
+    ELSE
+      _ascii := ascii(_temp);
+      IF _ascii > x'07ff'::int4 THEN
+        RAISE exception 'won''t deal with 3 (or more) byte sequences.';
+      END IF;
+      IF _ascii <= x'07f'::int4 THEN
+        _temp := '%' || to_hex(_ascii);
+      ELSE
+        _temp := '%' || to_hex((_ascii & x'03f'::int4) + x'80'::int4);
+        _ascii := _ascii >> 6;
+        _temp := '%' || to_hex((_ascii & x'01f'::int4) + x'c0'::int4) || _temp;
+      END IF;
+      _result := _result || upper(_temp);
+    END IF;
+  END LOOP;
+  RETURN _result;
 END;
-$EOFCODE$ LANGUAGE plpgsql STABLE;
-
-CREATE FUNCTION totp.generate_totp_time_key ( totp_interval int DEFAULT 30, from_time timestamptz DEFAULT now() ) RETURNS text AS $EOFCODE$
-  SELECT
-    lpad(to_hex(floor(extract(epoch FROM from_time) / totp_interval)::int), 16, '0');
-$EOFCODE$ LANGUAGE sql STABLE;
+$EOFCODE$ LANGUAGE plpgsql STRICT IMMUTABLE;
 
 CREATE FUNCTION totp.t_unix (  timestamptz ) RETURNS bigint AS $EOFCODE$
 SELECT floor(EXTRACT(epoch FROM $1))::bigint;
@@ -34,19 +40,19 @@ CREATE FUNCTION totp.n ( t timestamptz, step bigint DEFAULT 30 ) RETURNS bigint 
 SELECT floor(totp.t_unix(t) / step)::bigint;
 $EOFCODE$ LANGUAGE sql IMMUTABLE;
 
-CREATE FUNCTION totp.n_hex ( n int ) RETURNS text AS $EOFCODE$
+CREATE FUNCTION totp.n_hex ( n bigint ) RETURNS text AS $EOFCODE$
 DECLARE
  missing_padding int;
  hext text;
 BEGIN
-    hext = to_hex(n);
-    missing_padding = character_length(hext) % 16;
-    if missing_padding != 0 THEN
-      hext = lpad('', (16 - missing_padding), '0') || hext;
-    END IF;
-  RETURN hext;
+  hext = to_hex(n);
+  RETURN lpad(hext, 16, '0');
 END;
 $EOFCODE$ LANGUAGE plpgsql IMMUTABLE;
+
+CREATE FUNCTION totp.generate_totp_time_key ( totp_interval int DEFAULT 30, from_time timestamptz DEFAULT now() ) RETURNS text AS $EOFCODE$
+  SELECT totp.n_hex( totp.n ( from_time, totp_interval ) );
+$EOFCODE$ LANGUAGE sql IMMUTABLE;
 
 CREATE FUNCTION totp.n_hex_to_8_bytes ( input text ) RETURNS bytea AS $EOFCODE$
 DECLARE
@@ -174,7 +180,7 @@ BEGIN
 END;
 $EOFCODE$ LANGUAGE plpgsql IMMUTABLE;
 
-CREATE FUNCTION totp.generate_totp_token ( totp_secret text, totp_interval int DEFAULT 30, totp_length int DEFAULT 6, time_from timestamptz DEFAULT now(), algo text DEFAULT 'sha1' ) RETURNS text AS $EOFCODE$
+CREATE FUNCTION totp.generate ( totp_secret text, totp_interval int DEFAULT 30, totp_length int DEFAULT 6, time_from timestamptz DEFAULT now(), algo text DEFAULT 'sha1' ) RETURNS text AS $EOFCODE$
 DECLARE 
   v_bytes_int int;
   n int;
@@ -219,54 +225,23 @@ BEGIN
 END;
 $EOFCODE$ LANGUAGE plpgsql IMMUTABLE;
 
-CREATE FUNCTION totp.random_base32 ( _length int DEFAULT 16 ) RETURNS text LANGUAGE sql AS $EOFCODE$
-  SELECT
-    string_agg(('{a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,2,3,4,5,6,7}'::text[])[ceil(random() * 32)], '')
-  FROM
-    generate_series(1, _length);
-$EOFCODE$;
-
-CREATE FUNCTION totp.urlencode ( in_str text ) RETURNS text AS $EOFCODE$
-DECLARE
-  _i int4;
-  _temp varchar;
-  _ascii int4;
-  _result text := '';
-BEGIN
-  FOR _i IN 1..length(in_str)
-  LOOP
-    _temp := substr(in_str, _i, 1);
-    IF _temp ~ '[0-9a-zA-Z:/@._?#-]+' THEN
-      _result := _result || _temp;
-    ELSE
-      _ascii := ascii(_temp);
-      IF _ascii > x'07ff'::int4 THEN
-        RAISE exception 'won''t deal with 3 (or more) byte sequences.';
-      END IF;
-      IF _ascii <= x'07f'::int4 THEN
-        _temp := '%' || to_hex(_ascii);
-      ELSE
-        _temp := '%' || to_hex((_ascii & x'03f'::int4) + x'80'::int4);
-        _ascii := _ascii >> 6;
-        _temp := '%' || to_hex((_ascii & x'01f'::int4) + x'c0'::int4) || _temp;
-      END IF;
-      _result := _result || upper(_temp);
-    END IF;
-  END LOOP;
-  RETURN _result;
-END;
-$EOFCODE$ LANGUAGE plpgsql STRICT IMMUTABLE;
-
-CREATE FUNCTION totp.totp_url ( email text, totp_secret text, totp_interval int, totp_issuer text ) RETURNS text AS $EOFCODE$
-  SELECT
-    concat('otpauth://totp/', totp.urlencode (email), '?secret=', totp.urlencode (totp_secret), '&period=', totp.urlencode (totp_interval::text), '&issuer=', totp.urlencode (totp_issuer));
-$EOFCODE$ LANGUAGE sql STRICT IMMUTABLE;
-
-CREATE FUNCTION totp.verify_totp ( totp_secret text, totp_interval int, totp_length int, check_totp text, time_from timestamptz DEFAULT now(), algo text DEFAULT 'sha1' ) RETURNS boolean AS $EOFCODE$
-  SELECT totp.generate_totp_token (
+CREATE FUNCTION totp.verify ( totp_secret text, check_totp text, totp_interval int DEFAULT 30, totp_length int DEFAULT 6, time_from timestamptz DEFAULT now(), algo text DEFAULT 'sha1' ) RETURNS boolean AS $EOFCODE$
+  SELECT totp.generate (
     totp_secret,
     totp_interval,
     totp_length,
     time_from,
     algo) = check_totp;
 $EOFCODE$ LANGUAGE sql;
+
+CREATE FUNCTION totp.url ( email text, totp_secret text, totp_interval int, totp_issuer text ) RETURNS text AS $EOFCODE$
+  SELECT
+    concat('otpauth://totp/', totp.urlencode (email), '?secret=', totp.urlencode (totp_secret), '&period=', totp.urlencode (totp_interval::text), '&issuer=', totp.urlencode (totp_issuer));
+$EOFCODE$ LANGUAGE sql STRICT IMMUTABLE;
+
+CREATE FUNCTION totp.random_base32 ( _length int DEFAULT 16 ) RETURNS text LANGUAGE sql AS $EOFCODE$
+  SELECT
+    string_agg(('{a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,2,3,4,5,6,7}'::text[])[ceil(random() * 32)], '')
+  FROM
+    generate_series(1, _length);
+$EOFCODE$;
