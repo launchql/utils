@@ -54,6 +54,23 @@ otpauth://totp/customer@email.com?secret=mysecret&period=30&issuer=Acme%20Inc
 
 Currently only supports `sha1`, pull requests welcome!
 
+# debugging
+
+use the verbose option to show keys
+
+```sh
+$ oathtool --totp -v -d 7 -s 10s -b OH3NUPO3WOGOZZQ4
+Hex secret: 71f6da3ddbb38cece61c
+Base32 secret: OH3NUPO3WOGOZZQ4
+Digits: 7
+Window size: 0
+TOTP mode: SHA1
+Step size (seconds): 10
+Start time: 1970-01-01 00:00:00 UTC (0)
+Current time: 2020-11-18 12:35:08 UTC (1605702908)
+Counter: 0x9921BB2 (160570290)
+```
+
 # credits
 
 Thanks to 
@@ -63,6 +80,10 @@ https://tools.ietf.org/html/rfc6238
 https://www.youtube.com/watch?v=VOYxF12K1vE
 
 https://pgxn.org/dist/otp/
+
+And major improvements from 
+
+https://gist.github.com/bwbroersma/676d0de32263ed554584ab132434ebd9
 
 # Development
 
