@@ -239,12 +239,16 @@ DECLARE
   output text[];
   decoded text = base32.decode(input);
   len int = character_length(decoded);
+  hx text;
 BEGIN
 
   FOR i IN 1 .. len LOOP
-    output = array_append(output, 
-      to_hex(ascii(substring(decoded from i for 1)))::text
-    );
+    hx = to_hex(ascii(substring(decoded from i for 1)))::text;
+    IF (character_length(hx) = 1) THEN 
+        -- if it is odd number of digits, pad a 0 so it can later 
+    		hx = '0' || hx;	
+    END IF;
+    output = array_append(output, hx);
   END LOOP;
 
   RETURN array_to_string(output, '');

@@ -33,6 +33,7 @@ DECLARE
   i int;
   output text[];
 BEGIN
+  input = upper(input);
   FOR i IN 1 .. character_length(input) LOOP
     output = array_append(output, base32.base32_alphabet_to_decimal(substring(input from i for 1)));
   END LOOP;
