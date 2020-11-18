@@ -229,10 +229,13 @@ it('generate', async () => {
   const { generate } = await db.one(
     `
     SELECT  totp.generate(
-        totp_secret := $1,
-        totp_interval := 30,
-        totp_length := 6,
-        time_from := $2
+        secret := $1,
+        period := 30,
+        digits := 6,
+        time_from := $2,
+        hash := 'sha1',
+        encoding := NULL,
+        clock_offset := 0
         )
       `,
     ['Hello!Þ­¾ï', new Date()]
@@ -240,10 +243,13 @@ it('generate', async () => {
   const { generate: second } = await db.one(
     `
     SELECT  totp.generate(
-        totp_secret := $1,
-        totp_interval := 30,
-        totp_length := 6,
-        time_from := $2
+        secret := $1,
+        period := 30,
+        digits := 6,
+        time_from := $2,
+        hash := 'sha1',
+        encoding := NULL,
+        clock_offset := 0
         )
       `,
     ['jbswy3dpehpk3pxp', new Date()]
@@ -272,11 +278,12 @@ cases(
     const { generate } = await db.one(
       `
             SELECT  totp.generate(
-                totp_secret := $1,
-                totp_interval := 30,
-                totp_length := $2,
+                secret := $1,
+                period := 30,
+                digits := $2,
                 time_from := $3,
-                algo := $4
+                hash := $4,
+                encoding := NULL
                 )
               `,
       ['12345678901234567890', opts.len, opts.date, opts.algo]
@@ -331,9 +338,9 @@ cases(
 //     const { generate } = await db.one(
 //       `
 //             SELECT  totp.generate(
-//                 totp_secret := $1,
-//                 totp_interval := 30,
-//                 totp_length := $2,
+//                 secret := $1,
+//                 period := 30,
+//                 digits := $2,
 //                 time_from := $3,
 //                 algo := $4
 //                 )
@@ -390,11 +397,12 @@ cases(
     const { generate } = await db.one(
       `
             SELECT  totp.generate(
-                totp_secret := $1,
-                totp_interval := $5,
-                totp_length := $2,
+                secret := $1,
+                period := $5,
+                digits := $2,
                 time_from := $3,
-                algo := $4
+                hash := $4,
+                encoding := NULL
                 )
               `,
       ['12345678901234567890', opts.len, opts.date, opts.algo, opts.step]
@@ -525,27 +533,27 @@ cases(
   ]
 );
 
-it('base32_to_hex', async () => {
-  const { base32_to_hex } = await db.one(
-    `
-          SELECT totp.base32_to_hex(
-              'OH3NUPO3WOGOZZQ4'
-            )
-            `
-  );
-  expect(base32_to_hex).toEqual('71f6da3ddbb38cece61c');
-});
+// it('base32_to_hex', async () => {
+//   const { base32_to_hex } = await db.one(
+//     `
+//           SELECT totp.base32_to_hex(
+//               'OH3NUPO3WOGOZZQ4'
+//             )
+//             `
+//   );
+//   expect(base32_to_hex).toEqual('71f6da3ddbb38cece61c');
+// });
 
-it('base32_to_hex', async () => {
-  const { base32_to_hex } = await db.one(
-    `
-          SELECT totp.base32_to_hex(
-              'pv6624hvb4kdcwe2'
-            )
-            `
-  );
-  expect(base32_to_hex).toEqual('7d7ded70f5f1431589a');
-});
+// it('base32_to_hex', async () => {
+//   const { base32_to_hex } = await db.one(
+//     `
+//           SELECT totp.base32_to_hex(
+//               'pv6624hvb4kdcwe2'
+//             )
+//             `
+//   );
+//   expect(base32_to_hex).toEqual('7d7ded70f50f1431589a');
+// });
 
 cases(
   'issue',
@@ -553,11 +561,11 @@ cases(
     const { generate } = await db.one(
       `
             SELECT  totp.generate(
-                totp_secret := $1,
-                totp_interval := $2,
-                totp_length := $3,
+                secret := $1,
+                period := $2,
+                digits := $3,
                 time_from := $4,
-                algo := $5,
+                hash := $5,
                 encoding := $6
                 )
               `,

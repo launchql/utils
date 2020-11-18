@@ -7,6 +7,7 @@ BEGIN;
 -- https://www.youtube.com/watch?v=VOYxF12K1vE
 -- https://tools.ietf.org/html/rfc6238
 -- http://blog.tinisles.com/2011/10/google-authenticator-one-time-password-algorithm-in-javascript/
+-- https://gist.github.com/bwbroersma/676d0de32263ed554584ab132434ebd9
 
 CREATE FUNCTION totp.t_unix (
   timestamptz
@@ -256,7 +257,7 @@ END;
 $$
 LANGUAGE 'plpgsql' IMMUTABLE;
 
-CREATE FUNCTION totp.generate (
+CREATE FUNCTION totp.generate_procedural (
   totp_secret text,
   totp_interval int default 30,
   totp_length int default 6,
@@ -313,26 +314,78 @@ BEGIN
 
 END;
 $$
-LANGUAGE 'plpgsql' IMMUTABLE;
+LANGUAGE 'plpgsql' VOLATILE;
+
+CREATE FUNCTION totp.hotp(key BYTEA, c INT, digits INT DEFAULT 6, hash TEXT DEFAULT 'sha1') RETURNS TEXT AS $$
+DECLARE
+    c BYTEA := '\x' || LPAD(TO_HEX(c), 16, '0');
+    mac BYTEA := HMAC(c, key, hash);
+    trunc_offset INT := GET_BYTE(mac, length(mac) - 1) % 16;
+    result TEXT := SUBSTRING(SET_BIT(SUBSTRING(mac FROM 1 + trunc_offset FOR 4), 7, 0)::TEXT, 2)::BIT(32)::INT % (10 ^ digits)::INT;
+BEGIN
+    RETURN LPAD(result, digits, '0');
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+CREATE FUNCTION totp.generate(
+    secret text, 
+    period int DEFAULT 30,
+    digits INT DEFAULT 6, 
+    time_from timestamptz DEFAULT NOW(),
+    hash TEXT DEFAULT 'sha1',
+    encoding TEXT DEFAULT 'base32',
+    clock_offset INT DEFAULT 0
+) RETURNS TEXT AS $$
+DECLARE
+    c INT := FLOOR(EXTRACT(EPOCH FROM time_from) / period)::INT + clock_offset;
+    key bytea;
+BEGIN
+
+  IF (encoding = 'base32') THEN 
+    key = ( '\x' || totp.base32_to_hex(secret) )::bytea;
+  ELSE 
+    key = secret::bytea;
+  END IF;
+
+  RETURN totp.hotp(key, c, digits, hash);
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+CREATE FUNCTION totp.generate_secret(hash TEXT DEFAULT 'sha1') RETURNS BYTEA AS $$
+BEGIN
+    -- See https://tools.ietf.org/html/rfc4868#section-2.1.2
+    -- The optimal key length for HMAC is the block size of the algorithm
+    CASE
+          WHEN hash = 'sha1'   THEN RETURN gen_random_bytes(20); -- = 160 bits
+          WHEN hash = 'sha256' THEN RETURN gen_random_bytes(32); -- = 256 bits
+          WHEN hash = 'sha512' THEN RETURN gen_random_bytes(64); -- = 512 bits
+          ELSE
+            RAISE EXCEPTION 'Unsupported hash algorithm for OTP (see RFC6238/4226).';
+            RETURN NULL;
+    END CASE;
+END;
+$$ LANGUAGE plpgsql VOLATILE;
 
 CREATE FUNCTION totp.verify (
-  totp_secret text,
+  secret text,
   check_totp text,
-  totp_interval int default 30,
-  totp_length int default 6,
+  period int default 30,
+  digits int default 6,
   time_from timestamptz DEFAULT NOW(),
-  algo text default 'sha1',
-  encoding text default null
+  hash text default 'sha1',
+  encoding text default NULL,
+  clock_offset int default 0
 )
   RETURNS boolean
   AS $$
   SELECT totp.generate (
-    totp_secret,
-    totp_interval,
-    totp_length,
+    secret,
+    period,
+    digits,
     time_from,
-    algo,
-    encoding) = check_totp;
+    hash,
+    encoding,
+    clock_offset) = check_totp;
 $$
 LANGUAGE 'sql';
 
