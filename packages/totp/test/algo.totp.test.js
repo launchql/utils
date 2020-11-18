@@ -524,3 +524,75 @@ cases(
     }
   ]
 );
+
+it('base32_to_hex', async () => {
+  const { base32_to_hex } = await db.one(
+    `
+          SELECT totp.base32_to_hex(
+              'OH3NUPO3WOGOZZQ4'
+            )
+            `
+  );
+  expect(base32_to_hex).toEqual('71f6da3ddbb38cece61c');
+});
+
+it('base32_to_hex', async () => {
+  const { base32_to_hex } = await db.one(
+    `
+          SELECT totp.base32_to_hex(
+              'pv6624hvb4kdcwe2'
+            )
+            `
+  );
+  expect(base32_to_hex).toEqual('7d7ded70f5f1431589a');
+});
+
+cases(
+  'issue',
+  async (opts) => {
+    const { generate } = await db.one(
+      `
+            SELECT  totp.generate(
+                totp_secret := $1,
+                totp_interval := $2,
+                totp_length := $3,
+                time_from := $4,
+                algo := $5,
+                encoding := $6
+                )
+              `,
+      [opts.secret, opts.step, opts.len, opts.date, opts.algo, opts.encoding]
+    );
+    expect(generate).toEqual(opts.result);
+    expect(generate).toMatchSnapshot();
+  },
+  [
+    {
+      encoding: null,
+      secret: 'OH3NUPO3WOGOZZQ4',
+      date: '2020-11-14 07:46:37.212048+00',
+      len: 6,
+      step: 30,
+      algo: 'sha1',
+      result: '476240'
+    },
+    {
+      encoding: 'base32',
+      secret: 'OH3NUPO3WOGOZZQ4',
+      date: '2020-11-14 07:46:37.212048+00',
+      len: 6,
+      step: 30,
+      algo: 'sha1',
+      result: '788648'
+    },
+    {
+      encoding: 'base32',
+      secret: 'OH3NUPO',
+      date: '2020-11-14 07:46:37.212048+00',
+      len: 6,
+      step: 30,
+      algo: 'sha1',
+      result: '080176'
+    }
+  ]
+);

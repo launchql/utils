@@ -208,13 +208,57 @@ END;
 $$
 LANGUAGE 'plpgsql' IMMUTABLE;
 
+CREATE FUNCTION totp.pad_secret (
+  input bytea,
+  len int
+) returns bytea as $$
+DECLARE 
+  output bytea;
+  orig_length int = octet_length(input);
+BEGIN
+  IF (orig_length = len) THEN 
+    RETURN input;
+  END IF;
+
+  -- create blank bytea size of new length
+  output = lpad('', len, 'x')::bytea;
+
+  FOR i IN 0 .. len-1 LOOP
+    output = set_byte(output, i, get_byte(input, i % orig_length));
+  END LOOP;
+
+  RETURN output;
+END;
+$$
+LANGUAGE 'plpgsql' IMMUTABLE;
+
+CREATE FUNCTION totp.base32_to_hex (
+  input text
+) returns text as $$
+DECLARE 
+  output text[];
+  decoded text = base32.decode(input);
+  len int = character_length(decoded);
+BEGIN
+
+  FOR i IN 1 .. len LOOP
+    output = array_append(output, 
+      to_hex(ascii(substring(decoded from i for 1)))::text
+    );
+  END LOOP;
+
+  RETURN array_to_string(output, '');
+END;
+$$
+LANGUAGE 'plpgsql' IMMUTABLE;
 
 CREATE FUNCTION totp.generate (
   totp_secret text,
   totp_interval int default 30,
   totp_length int default 6,
   time_from timestamptz DEFAULT NOW(),
-  algo text default 'sha1'
+  algo text default 'sha1',
+  encoding text default NULL
 ) returns text as $$
 DECLARE 
   v_bytes_int int;
@@ -229,7 +273,13 @@ BEGIN
     totp_interval
   );
 
-  v_secret = totp_secret::bytea;
+  IF (encoding = 'base32') THEN 
+    v_secret = ( '\x' || totp.base32_to_hex(totp_secret) )::bytea;
+  ELSE 
+    v_secret = totp_secret::bytea;
+  END IF;
+
+  -- v_secret = totp.pad_secret(v_secret, 20);
 
   v_hmc = totp.hmac_as_20_bytes( 
     totp.n_hex_to_8_bytes(
@@ -267,7 +317,8 @@ CREATE FUNCTION totp.verify (
   totp_interval int default 30,
   totp_length int default 6,
   time_from timestamptz DEFAULT NOW(),
-  algo text default 'sha1'
+  algo text default 'sha1',
+  encoding text default null
 )
   RETURNS boolean
   AS $$
@@ -276,7 +327,8 @@ CREATE FUNCTION totp.verify (
     totp_interval,
     totp_length,
     time_from,
-    algo) = check_totp;
+    algo,
+    encoding) = check_totp;
 $$
 LANGUAGE 'sql';
 
