@@ -32,11 +32,12 @@
     "graphql": "^14.0.2",
     "graphql-tag": "2.10.3",
     "jest": "26.1.0",
+    "jest-in-case": "1.0.2",
     "prettier": "2.0.5",
     "regenerator-runtime": "^0.13.2",
     "speakeasy": "2.0.0"
   },
   "dependencies": {
-    "jest-in-case": "1.0.2"
+    "@launchql/base32": "^0.0.2"
   }
 }

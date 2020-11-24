@@ -1,6 +1,6 @@
 # launchql-ext-status extension
 comment = 'launchql-ext-status extension'
-default_version = '0.0.1'
+default_version = '0.0.2'
 module_pathname = '$libdir/launchql-ext-status'
 requires = 'citext,plpgsql,uuid-ossp'
 relocatable = false
