@@ -4,7 +4,7 @@
   "description": "status",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "scripts": {
     "test": "FAST_TEST=1 launchql-templatedb && jest",
