@@ -71,6 +71,11 @@ Current time: 2020-11-18 12:35:08 UTC (1605702908)
 Counter: 0x9921BB2 (160570290)
 ```
 
+using time for testing
+
+oathtool --totp -v -d 6 -s 30s -b vmlhl2knm27eftq7 --now "2020-02-05 22:11:40 UTC"
+
+
 # credits
 
 Thanks to 
