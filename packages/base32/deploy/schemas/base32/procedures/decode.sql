@@ -6,7 +6,6 @@
 BEGIN;
 
 -- 'I' => '8'
-
 CREATE FUNCTION base32.base32_alphabet_to_decimal(
   input text
 ) returns text as $$
@@ -23,9 +22,7 @@ END;
 $$
 LANGUAGE 'plpgsql' IMMUTABLE;
 
-
 -- INQXI===  =>  ['8', '13', '16', '23', '8', '=', '=', '=']
-
 CREATE FUNCTION base32.base32_to_decimal(
   input text 
 ) returns text[] as $$
@@ -44,7 +41,6 @@ LANGUAGE 'plpgsql' STABLE;
 
 -- ['8', '13', '16', '23', '8', '=', '=', '=']
 -- [ '01000', '01101', '10000', '10111', '01000', 'xxxxx', 'xxxxx', 'xxxxx' ]
-
 CREATE FUNCTION base32.decimal_to_chunks(
   input text[]
 ) returns text[] as $$
@@ -65,8 +61,6 @@ BEGIN
 END;
 $$
 LANGUAGE 'plpgsql' STABLE;
-
-
 
 CREATE FUNCTION base32.base32_alphabet_to_decimal_int(
   input text
@@ -118,6 +112,17 @@ END;
 $$
 LANGUAGE 'plpgsql' IMMUTABLE;
 
+CREATE FUNCTION base32.valid(
+  input text
+) returns boolean as $$
+BEGIN 
+  IF (upper(input) ~* '^[A-Z2-7]+=*$') THEN 
+    RETURN true;
+  END IF;
+  RETURN false;
+END;
+$$
+LANGUAGE 'plpgsql' IMMUTABLE;
 
 CREATE FUNCTION base32.decode(
   input text
@@ -129,19 +134,23 @@ DECLARE
   len int;
   num int;
 
-
   value int = 0;
   index int = 0;
   bits int = 0;
 BEGIN
+  len = character_length(input);
+  IF (len = 0) THEN 
+    RETURN '';
+  END IF;
+
+  IF (NOT base32.valid(input)) THEN 
+    RAISE EXCEPTION 'INVALID_BASE32';
+  END IF;
+
   input = replace(input, '=', '');
   input = upper(input);
   len = character_length(input);
   num = len * 5 / 8;
-
-  IF (len = 0) THEN 
-    RETURN '';
-  END IF;
 
   select array(select * from generate_series(1,num))
   INTO arr;
@@ -150,31 +159,14 @@ BEGIN
     value = (value << 5) | base32.base32_alphabet_to_decimal_int(substring(input from i for 1));
     bits = bits + 5;
     IF (bits >= 8) THEN
-      -- arr[index] = (value >>> (bits - 8)) & 255;
-      arr[index] = base32.zero_fill(value, (bits - 8)) & 255;
+      arr[index] = base32.zero_fill(value, (bits - 8)) & 255; -- arr[index] = (value >>> (bits - 8)) & 255;
       index = index + 1;
       bits = bits - 8;
     END IF;
   END LOOP;
 
-  -- clean out bad stuff
-  -- and then always ends on number equal to the length 
-  -- e.g. Cat => [ 67, 97, 116, 3 ] 3 = length (and is in the last position)
-  -- e.g. foo =>  [ 102, 111, 111, 3 ] 
-
-  -- TODO WTF??? why does range (0, n-1) work? shouldn't it be 1-n???
-  -- Postgres arrays are 1-based by default. And in typical applications it's best to stick with the default. 
-  -- ****** But the syntax allows to start with any integer number
-  --  WHEN YOU DID THIS ABOVE ^^ arr[index] = base32.zero_fill(value, (bits - 8)) & 255;
-  -- YOU LEVERAGED feature of being able to have i = 0
-
   len = cardinality(arr);
   FOR i IN 0 .. len-2 LOOP
-    --  output = array_append(output, i::text);
-    --  output = array_append(output, ':[ ');
-    --  output = array_append(output, arr[i]::text);
-    --  output = array_append(output, '] ');
-    --  output = array_append(output, '\n');
      output = array_append(output, chr(arr[i]));
   END LOOP;
 
