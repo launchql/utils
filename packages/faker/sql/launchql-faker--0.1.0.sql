@@ -199,7 +199,36 @@ $EOFCODE$ LANGUAGE plpgsql VOLATILE;
 
 CREATE FUNCTION faker.phone (  ) RETURNS text AS $EOFCODE$
 BEGIN
-   RETURN '+1 (555) 555-5454';
+
+  RETURN concat('+1 ', 
+
+    '(',
+
+    array_to_string(ARRAY[
+      faker.integer(0,9),
+      faker.integer(0,9),
+      faker.integer(0,9)
+    ]::text[], ''),
+    
+    ') ',
+
+    array_to_string(ARRAY[
+      faker.integer(0,9),
+      faker.integer(0,9),
+      faker.integer(0,9)
+    ]::text[], ''),
+    
+    '-',
+
+    array_to_string(ARRAY[
+      faker.integer(0,9),
+      faker.integer(0,9),
+      faker.integer(0,9),
+      faker.integer(0,9)
+    ]::text[], '')
+
+  );
+
 END;
 $EOFCODE$ LANGUAGE plpgsql VOLATILE;
 
@@ -597,13 +626,13 @@ BEGIN
 END;
 $EOFCODE$ LANGUAGE plpgsql VOLATILE;
 
-CREATE FUNCTION faker.profilepic ( gender int ) RETURNS image AS $EOFCODE$
+CREATE FUNCTION faker.profilepic ( gender text ) RETURNS image AS $EOFCODE$
 DECLARE
   obj jsonb = '{}'::jsonb;
   vurl text = '';
   gndr text = 'women';
 BEGIN
-  IF (gender = 0) THEN 
+  IF (gender = 'M') THEN 
     gndr = 'men';
   END IF;
   vurl = concat('https://randomuser.me/api/portraits/', gndr, '/', faker.integer(1, 99) , '.jpg');
