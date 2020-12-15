@@ -1,6 +1,6 @@
 {
   "name": "@launchql/faker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "create fake data in PostgreSQL",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
@@ -33,6 +33,6 @@
     "regenerator-runtime": "^0.13.2"
   },
   "dependencies": {
-    "@launchql/ext-types": "^0.1.0"
+    "@launchql/ext-types": "^0.1.1"
   }
 }
