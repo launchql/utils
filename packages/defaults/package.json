@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-defaults",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "defaults",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
