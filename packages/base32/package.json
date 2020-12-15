@@ -31,5 +31,6 @@
     "jest-in-case": "1.0.2",
     "prettier": "2.0.5",
     "regenerator-runtime": "^0.13.2"
-  }
+  },
+  "gitHead": "86534302af44691b50c25260ffcd3e4b43ba3557"
 }
