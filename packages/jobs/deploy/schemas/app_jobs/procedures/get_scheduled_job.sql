@@ -11,9 +11,15 @@ DECLARE
   v_job_id bigint;
   v_row app_jobs.scheduled_jobs;
 BEGIN
+
+  --
+
   IF worker_id IS NULL THEN
     RAISE exception 'INVALID_WORKER_ID';
   END IF;
+
+  --
+
   SELECT
     scheduled_jobs.id INTO v_job_id
   FROM
@@ -27,9 +33,15 @@ BEGIN
   LIMIT 1
   FOR UPDATE
     SKIP LOCKED;
+
+  --
+
   IF v_job_id IS NULL THEN
     RETURN NULL;
   END IF;
+
+  --
+
   UPDATE
     app_jobs.scheduled_jobs
   SET
@@ -39,6 +51,9 @@ BEGIN
     id = v_job_id
   RETURNING
     * INTO v_row;
+
+  --
+
   RETURN v_row;
 END;
 $$;

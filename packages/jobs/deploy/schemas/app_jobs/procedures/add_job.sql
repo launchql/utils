@@ -5,6 +5,7 @@
 
 BEGIN;
 CREATE FUNCTION app_jobs.add_job (
+  db_id uuid,
   identifier text,
   payload json DEFAULT '{}' ::json,
   job_key text DEFAULT NULL,
@@ -20,11 +21,34 @@ DECLARE
 BEGIN
   IF job_key IS NOT NULL THEN
     -- Upsert job	
-    INSERT INTO app_jobs.jobs (task_identifier, payload, queue_name, run_at, max_attempts, KEY, priority)	
-      VALUES (identifier, coalesce(payload, '{}'::json), queue_name, coalesce(run_at, now()), coalesce(max_attempts, 25), job_key, coalesce(priority, 0))	
-    ON CONFLICT (KEY)	
+    INSERT INTO app_jobs.jobs (
+      database_id,
+      task_identifier,
+      payload,
+      queue_name,
+      run_at,
+      max_attempts,
+      key,
+      priority
+    ) VALUES (
+        db_id,
+        identifier,
+        coalesce(payload,
+        '{}'::json),
+        queue_name,
+        coalesce(run_at, now()),
+        coalesce(max_attempts, 25),
+        job_key,
+        coalesce(priority, 0)
+    )	
+    ON CONFLICT (key)	
       DO UPDATE SET	
-        task_identifier = excluded.task_identifier, payload = excluded.payload, queue_name = excluded.queue_name, max_attempts = excluded.max_attempts, run_at = excluded.run_at, priority = excluded.priority,	
+        task_identifier = EXCLUDED.task_identifier,
+        payload = EXCLUDED.payload,
+        queue_name = EXCLUDED.queue_name,
+        max_attempts = EXCLUDED.max_attempts,
+        run_at = EXCLUDED.run_at,
+        priority = EXCLUDED.priority,	
         -- always reset error/retry state	
         attempts = 0, last_error = NULL	
       WHERE	
@@ -51,15 +75,29 @@ BEGIN
       KEY = job_key;	
   END IF;
 
-  INSERT INTO app_jobs.jobs (task_identifier, payload, queue_name, run_at, max_attempts, priority)
-    VALUES (identifier, payload, queue_name, run_at, max_attempts, priority)
-  RETURNING
-    * INTO v_job;
+  INSERT INTO app_jobs.jobs (
+    database_id,
+    task_identifier,
+    payload,
+    queue_name,
+    run_at,
+    max_attempts,
+    priority
+  ) VALUES (
+    db_id,
+    identifier,
+    payload,
+    queue_name,
+    run_at,
+    max_attempts,
+    priority
+  )
+  RETURNING * INTO v_job;
+
   RETURN v_job;
 END;
 $$
-LANGUAGE 'plpgsql'
-VOLATILE
-SECURITY DEFINER;
+LANGUAGE 'plpgsql' VOLATILE SECURITY DEFINER;
+
 COMMIT;
 

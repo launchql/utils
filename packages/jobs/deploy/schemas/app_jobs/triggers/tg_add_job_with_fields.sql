@@ -1,6 +1,7 @@
 -- Deploy schemas/app_jobs/triggers/tg_add_job_with_fields to pg
 -- requires: schemas/app_jobs/schema
 -- requires: schemas/app_jobs/helpers/json_build_object_apply
+-- requires: schemas/app_jobs/procedures/get_database_id 
 
 BEGIN;
 CREATE FUNCTION app_jobs.trigger_job_with_fields ()
@@ -34,7 +35,7 @@ BEGIN
       END IF;
     END LOOP;
   PERFORM
-    app_jobs.add_job (fn, app_jobs.json_build_object_apply (args));
+    app_jobs.add_job (app_jobs.get_database_id(), fn, app_jobs.json_build_object_apply (args));
   IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
     RETURN NEW;
   END IF;

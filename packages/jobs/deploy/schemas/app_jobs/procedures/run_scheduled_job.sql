@@ -19,7 +19,9 @@ BEGIN
     app_jobs.scheduled_jobs s
   WHERE
     s.id = run_scheduled_job.id INTO last_id;
+
   -- if it's been scheduled check if it's been run
+  
   IF (last_id IS NOT NULL) THEN
     SELECT
       locked_by
@@ -35,9 +37,18 @@ BEGIN
       RAISE EXCEPTION 'ALREADY_SCHEDULED';
     END IF;
   END IF;
+
   -- insert new job
-  INSERT INTO app_jobs.jobs (queue_name, task_identifier, payload, priority, max_attempts, key)
-  SELECT
+  INSERT INTO app_jobs.jobs (
+    database_id,
+    queue_name,
+    task_identifier,
+    payload,
+    priority,
+    max_attempts,
+    key
+  ) SELECT
+    database_id,
     queue_name,
     task_identifier,
     payload,

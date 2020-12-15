@@ -27,16 +27,19 @@ END;
 $$
 LANGUAGE 'plpgsql'
 VOLATILE;
+
 CREATE TRIGGER decrease_job_queue_count_on_delete
   AFTER DELETE ON app_jobs.jobs
   FOR EACH ROW
   WHEN ((OLD.queue_name IS NOT NULL))
   EXECUTE PROCEDURE app_jobs.tg_decrease_job_queue_count ();
+
 -- only a person would do this...
 CREATE TRIGGER decrease_job_queue_count_on_update
   AFTER UPDATE OF queue_name ON app_jobs.jobs
   FOR EACH ROW
   WHEN (((NEW.queue_name IS DISTINCT FROM OLD.queue_name) AND (OLD.queue_name IS NOT NULL)))
   EXECUTE PROCEDURE app_jobs.tg_decrease_job_queue_count ();
+  
 COMMIT;
 

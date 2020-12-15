@@ -1,2 +1,2 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
-export { wrapConn, getConnections } from '@launchql/db-testing';
+export { getConnections } from '@launchql/db-testing';

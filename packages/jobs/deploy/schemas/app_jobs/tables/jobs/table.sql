@@ -4,6 +4,7 @@
 BEGIN;
 CREATE TABLE app_jobs.jobs (
   id bigserial PRIMARY KEY,
+  database_id uuid NOT NULL,
   queue_name text DEFAULT (public.gen_random_uuid ()) ::text,
   task_identifier text NOT NULL,
   payload json DEFAULT '{}' ::json NOT NULL,

@@ -14,9 +14,13 @@ DECLARE
   v_row app_jobs.jobs;
   v_now timestamptz = now();
 BEGIN
+
   IF worker_id IS NULL THEN
     RAISE exception 'INVALID_WORKER_ID';
   END IF;
+
+  --
+
   SELECT
     jobs.queue_name,
     jobs.id INTO v_queue_name,
@@ -48,9 +52,15 @@ BEGIN
   LIMIT 1
   FOR UPDATE
     SKIP LOCKED;
+
+  --
+
   IF v_job_id IS NULL THEN
     RETURN NULL;
   END IF;
+
+  --
+
   IF v_queue_name IS NOT NULL THEN
     UPDATE
       app_jobs.job_queues
@@ -60,6 +70,9 @@ BEGIN
     WHERE
       job_queues.queue_name = v_queue_name;
   END IF;
+
+  --
+
   UPDATE
     app_jobs.jobs
   SET
@@ -70,6 +83,8 @@ BEGIN
     id = v_job_id
   RETURNING
     * INTO v_row;
+
+  --
   RETURN v_row;
 END;
 $$;
