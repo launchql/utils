@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`get values 1`] = `
+Object {
+  "user_agent": Array [
+    Object {
+      "current_user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
+    },
+  ],
+}
+`;
+
+exports[`get values 2`] = `
+Object {
+  "ip_address": Array [
+    Object {
+      "current_ip_address": "127.0.0.1",
+    },
+  ],
+}
+`;
+
+exports[`get values 3`] = `
+Object {
+  "database_id": Array [
+    Object {
+      "current_database_id": null,
+    },
+  ],
+}
+`;
+
+exports[`get values 4`] = `
+Object {
+  "user_id": Array [
+    Object {
+      "current_user_id": null,
+    },
+  ],
+}
+`;

@@ -1,12 +1,12 @@
 \echo Use "CREATE EXTENSION launchql-achievements" to load this file. \quit
-CREATE SCHEMA status_private;
+CREATE SCHEMA IF NOT EXISTS status_private;
 
 GRANT USAGE ON SCHEMA status_private TO authenticated, anonymous;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA status_private 
  GRANT EXECUTE ON FUNCTIONS  TO authenticated;
 
-CREATE SCHEMA status_public;
+CREATE SCHEMA IF NOT EXISTS status_public;
 
 GRANT USAGE ON SCHEMA status_public TO authenticated, anonymous;
 
