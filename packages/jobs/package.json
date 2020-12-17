@@ -34,5 +34,5 @@
   "dependencies": {
     "@launchql/ext-default-roles": "^0.1.4"
   },
-  "gitHead": "6f1aecd3b33f2e55f08163181b4c43d941aeb018"
+  "gitHead": "f313ed5129fd360dd5f1acca8287a691cbdd9818"
 }
