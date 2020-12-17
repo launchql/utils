@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-measurements",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "measurements",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
