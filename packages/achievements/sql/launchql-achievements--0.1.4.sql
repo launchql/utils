@@ -26,14 +26,20 @@ COMMENT ON TABLE status_public.user_steps IS E'The user achieving a requirement 
 CREATE INDEX ON status_public.user_steps ( user_id, name );
 
 CREATE FUNCTION status_private.user_completed_step ( step text, user_id uuid DEFAULT jwt_public.current_user_id() ) RETURNS void AS $EOFCODE$
-  INSERT INTO status_public.user_steps ( step, user_id, count )
+  INSERT INTO status_public.user_steps ( name, user_id, count )
   VALUES ( step, user_id, 1 );
 $EOFCODE$ LANGUAGE sql VOLATILE SECURITY DEFINER;
 
 CREATE FUNCTION status_private.user_incompleted_step ( step text, user_id uuid DEFAULT jwt_public.current_user_id() ) RETURNS void AS $EOFCODE$
-  INSERT INTO status_public.user_steps ( step, user_id, count )
-  VALUES ( step, user_id, -1 );
-$EOFCODE$ LANGUAGE sql VOLATILE SECURITY DEFINER;
+BEGIN
+  DELETE FROM status_public.user_steps s
+    WHERE s.user_id = user_incompleted_step.user_id
+    AND s.name = step;
+  DELETE FROM status_public.user_achievements a
+    WHERE a.user_id = user_incompleted_step.user_id
+    AND a.name = step;
+END;
+$EOFCODE$ LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
 CREATE FUNCTION status_private.tg_achievement (  ) RETURNS trigger AS $EOFCODE$
 DECLARE

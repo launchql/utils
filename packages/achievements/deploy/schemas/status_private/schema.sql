@@ -3,7 +3,7 @@
 
 BEGIN;
 
-CREATE SCHEMA status_private;
+CREATE SCHEMA IF NOT EXISTS status_private;
 
 GRANT USAGE ON SCHEMA status_private
 TO authenticated, anonymous;

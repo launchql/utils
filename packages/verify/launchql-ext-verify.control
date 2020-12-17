@@ -1,6 +1,6 @@
 # launchql-ext-verify extension
 comment = 'launchql-ext-verify extension'
-default_version = '0.1.6'
+default_version = '0.1.7'
 module_pathname = '$libdir/launchql-ext-verify'
 requires = 'plpgsql'
 relocatable = false
