@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-jobs-queue",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "jobs",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
@@ -32,7 +32,7 @@
     "regenerator-runtime": "^0.13.2"
   },
   "dependencies": {
-    "@launchql/ext-default-roles": "^0.1.6"
+    "@launchql/ext-default-roles": "^0.1.7"
   },
   "gitHead": "f313ed5129fd360dd5f1acca8287a691cbdd9818"
 }
