@@ -2,14 +2,14 @@
 %project=launchql-achievements
 %uri=launchql-achievements
   
-schemas/status_public/schema 2020-12-17T00:03:14Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_public/schema
-schemas/status_private/schema 2020-12-17T00:03:18Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_private/schema
-schemas/status_public/tables/levels/table [schemas/status_public/schema] 2020-12-17T00:09:57Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_public/tables/levels/table
-schemas/status_public/tables/level_requirements/table [schemas/status_public/schema] 2020-12-17T00:10:04Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_public/tables/level_requirements/table
-schemas/status_public/tables/user_steps/table [schemas/status_public/schema] 2020-12-17T00:10:09Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_public/tables/user_steps/table
-schemas/status_public/tables/user_achievements/table [schemas/status_public/schema] 2020-12-17T00:10:36Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_public/tables/user_achievements/table
-schemas/status_public/tables/user_levels/table [schemas/status_public/schema] 2020-12-17T00:10:47Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_public/tables/user_levels/table
-schemas/status_public/tables/user_steps/triggers/update_achievements_tg [schemas/status_public/schema schemas/status_public/tables/user_steps/table] 2020-12-17T01:39:14Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_public/tables/user_steps/triggers/update_achievements_tg
-schemas/status_private/procedures/upsert_achievement [schemas/status_private/schema] 2020-12-17T02:00:41Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_private/procedures/upsert_achievement
-schemas/status_public/procedures/user_achieved [schemas/status_public/schema] 2020-12-17T02:17:16Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_public/procedures/user_achieved
-schemas/status_public/procedures/tasks_required_for [schemas/status_public/schema] 2020-12-17T02:17:43Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/status_public/procedures/tasks_required_for
+schemas/status_private/schema [launchql-jwt-claims:schemas/jwt_public/procedures/current_user_id] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_private/schema
+schemas/status_public/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/schema
+schemas/status_public/tables/user_achievements/table [schemas/status_public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/tables/user_achievements/table
+schemas/status_private/procedures/upsert_achievement [schemas/status_private/schema schemas/status_public/tables/user_achievements/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_private/procedures/upsert_achievement
+schemas/status_public/tables/levels/table [schemas/status_public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/tables/levels/table
+schemas/status_public/tables/level_requirements/table [schemas/status_public/schema schemas/status_public/tables/levels/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/tables/level_requirements/table
+schemas/status_public/procedures/steps_required [schemas/status_public/schema schemas/status_public/tables/level_requirements/table schemas/status_public/tables/user_achievements/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/procedures/steps_required
+schemas/status_public/procedures/user_achieved [schemas/status_public/schema schemas/status_public/procedures/steps_required schemas/status_public/tables/level_requirements/table schemas/status_public/tables/user_achievements/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/procedures/user_achieved
+schemas/status_public/tables/user_levels/table [schemas/status_public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/tables/user_levels/table
+schemas/status_public/tables/user_steps/table [schemas/status_public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/tables/user_steps/table
+schemas/status_public/tables/user_steps/triggers/update_achievements_tg [schemas/status_public/schema schemas/status_public/tables/user_steps/table schemas/status_public/tables/user_achievements/table schemas/status_private/procedures/upsert_achievement] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/tables/user_steps/triggers/update_achievements_tg

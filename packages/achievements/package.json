@@ -34,5 +34,6 @@
     "jest": "26.1.0",
     "prettier": "2.0.5",
     "regenerator-runtime": "^0.13.2"
-  }
+  },
+  "gitHead": "6f1aecd3b33f2e55f08163181b4c43d941aeb018"
 }
