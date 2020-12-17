@@ -4,15 +4,17 @@
 
 BEGIN;
 
-CREATE TABLE status_public.user_levels (
-    id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-    user_id uuid NOT NULL,
-    name text NOT NULL, -- references levels
-    created_at timestamptz NOT NULL DEFAULT current_timestamp  
-);
+-- NOT using yet, so commented it out for simplicity
 
-COMMENT ON TABLE status_public.user_levels IS 'Cache table of the achieved levels';
+-- CREATE TABLE status_public.user_levels (
+--     id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+--     user_id uuid NOT NULL,
+--     name text NOT NULL, -- references levels
+--     created_at timestamptz NOT NULL DEFAULT current_timestamp  
+-- );
 
-CREATE INDEX ON status_public.user_levels (user_id, name);
+-- COMMENT ON TABLE status_public.user_levels IS 'Cache table of the achieved levels';
+
+-- CREATE INDEX ON status_public.user_levels (user_id, name);
 
 COMMIT;

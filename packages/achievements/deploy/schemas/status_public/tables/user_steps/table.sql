@@ -13,7 +13,6 @@ CREATE TABLE status_public.user_steps (
 );
 
 COMMENT ON TABLE status_public.user_steps IS 'The user achieving a requirement for a level. Log table that has every single step ever taken.';
-
 CREATE INDEX ON status_public.user_steps (user_id, name);
 
 COMMIT;

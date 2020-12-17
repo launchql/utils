@@ -10,4 +10,6 @@ CREATE TABLE status_public.levels (
 
 COMMENT ON TABLE status_public.levels IS 'Levels for achievement';
 
+GRANT SELECT ON TABLE status_public.levels TO authenticated;
+
 COMMIT;

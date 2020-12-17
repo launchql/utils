@@ -15,7 +15,7 @@ CREATE TABLE status_public.level_requirements (
 );
 
 COMMENT ON TABLE status_public.level_requirements IS 'Requirements to achieve a level';
-
 CREATE INDEX ON status_public.level_requirements (name, level, priority);
+GRANT SELECT ON TABLE status_public.levels TO authenticated;
 
 COMMIT;
