@@ -1,5 +1,5 @@
 EXTENSION = launchql-ext-measurements
-DATA = sql/launchql-ext-measurements--0.0.19.sql
+DATA = sql/launchql-ext-measurements--0.0.20.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)

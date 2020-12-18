@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "@launchql/ext-default-roles": "^0.1.11",
-    "@launchql/ext-jobs": "^0.2.10"
-  },
-  "gitHead": "f313ed5129fd360dd5f1acca8287a691cbdd9818"
+    "@launchql/ext-jwt-claims": "^0.1.8"
+  }
 }
