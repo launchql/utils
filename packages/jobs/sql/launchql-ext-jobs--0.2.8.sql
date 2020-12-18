@@ -304,26 +304,6 @@ BEGIN
 END;
 $EOFCODE$;
 
-CREATE FUNCTION app_jobs.get_database_id (  ) RETURNS uuid AS $EOFCODE$
-DECLARE
-  v_identifier_id uuid;
-BEGIN
-  IF current_setting('jwt.claims.database_id', TRUE)
-    IS NOT NULL THEN
-    BEGIN
-      v_identifier_id = current_setting('jwt.claims.database_id', TRUE)::uuid;
-    EXCEPTION
-      WHEN OTHERS THEN
-      RAISE NOTICE 'Invalid UUID value';
-    RETURN NULL;
-    END;
-    RETURN v_identifier_id;
-  ELSE
-    RETURN NULL;
-  END IF;
-END;
-$EOFCODE$ LANGUAGE plpgsql STABLE;
-
 CREATE FUNCTION app_jobs.get_job ( worker_id text, task_identifiers text[] DEFAULT NULL, job_expiry interval DEFAULT '4 hours' ) RETURNS app_jobs.jobs LANGUAGE plpgsql AS $EOFCODE$
 DECLARE
   v_job_id bigint;
@@ -731,7 +711,7 @@ BEGIN
       END IF;
     END LOOP;
   PERFORM
-    app_jobs.add_job (app_jobs.get_database_id(), fn, app_jobs.json_build_object_apply (args));
+    app_jobs.add_job (jwt_private.current_database_id(), fn, app_jobs.json_build_object_apply (args));
   IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
     RETURN NEW;
   END IF;
@@ -745,12 +725,12 @@ CREATE FUNCTION app_jobs.tg_add_job_with_row_id (  ) RETURNS trigger AS $EOFCODE
 BEGIN
   IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
     PERFORM
-      app_jobs.add_job (app_jobs.get_database_id(), tg_argv[0], json_build_object('id', NEW.id));
+      app_jobs.add_job (jwt_private.current_database_id(), tg_argv[0], json_build_object('id', NEW.id));
     RETURN NEW;
   END IF;
   IF (TG_OP = 'DELETE') THEN
     PERFORM
-      app_jobs.add_job (app_jobs.get_database_id(), tg_argv[0], json_build_object('id', OLD.id));
+      app_jobs.add_job (jwt_private.current_database_id(), tg_argv[0], json_build_object('id', OLD.id));
     RETURN OLD;
   END IF;
 END;
@@ -762,12 +742,12 @@ CREATE FUNCTION app_jobs.tg_add_job_with_row (  ) RETURNS trigger AS $EOFCODE$
 BEGIN
   IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
     PERFORM
-      app_jobs.add_job (app_jobs.get_database_id(), TG_ARGV[0], to_json(NEW));
+      app_jobs.add_job (jwt_private.current_database_id(), TG_ARGV[0], to_json(NEW));
     RETURN NEW;
   END IF;
   IF (TG_OP = 'DELETE') THEN
     PERFORM
-      app_jobs.add_job (app_jobs.get_database_id(), TG_ARGV[0], to_json(OLD));
+      app_jobs.add_job (jwt_private.current_database_id(), TG_ARGV[0], to_json(OLD));
     RETURN OLD;
   END IF;
 END;

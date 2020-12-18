@@ -1,5 +1,5 @@
 EXTENSION = launchql-ext-default-roles
-DATA = sql/launchql-ext-default-roles--0.1.8.sql
+DATA = sql/launchql-ext-default-roles--0.1.9.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
