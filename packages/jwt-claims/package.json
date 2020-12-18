@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-jwt-claims",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "ext-jwt-claims",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
