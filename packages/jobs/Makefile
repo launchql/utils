@@ -1,5 +1,5 @@
 EXTENSION = launchql-ext-jobs
-DATA = sql/launchql-ext-jobs--0.2.11.sql
+DATA = sql/launchql-ext-jobs--0.2.12.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
