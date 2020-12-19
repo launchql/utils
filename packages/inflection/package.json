@@ -1,6 +1,6 @@
 {
   "name": "@launchql/inflection",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "inflection is a port of the functionality from Ruby on Rails' Active Support Inflection classes into PostgreSQL",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {

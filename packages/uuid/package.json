@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-uuid",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "uuid",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
@@ -29,6 +29,5 @@
     "jest": "26.1.0",
     "prettier": "2.0.5",
     "regenerator-runtime": "^0.13.2"
-  },
-  "dependencies": {}
+  }
 }
