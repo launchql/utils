@@ -1,15 +1,14 @@
 {
-  "name": "@launchql/ext-achievements",
-  "version": "0.1.10",
-  "description": "achievements",
+  "name": "@launchql/ext-uuid",
+  "version": "0.0.1",
+  "description": "uuid",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   },
   "scripts": {
     "test": "FAST_TEST=1 launchql-templatedb && jest",
-    "test:watch": "FAST_TEST=1 jest --watch",
-    "prepare": "lql package"
+    "test:watch": "FAST_TEST=1 jest --watch"
   },
   "devDependencies": {
     "@babel/cli": "7.10.4",
@@ -30,7 +29,5 @@
     "prettier": "2.0.5",
     "regenerator-runtime": "^0.13.2"
   },
-  "dependencies": {
-    "@launchql/ext-jwt-claims": "^0.1.10"
-  }
+  "dependencies": {}
 }
