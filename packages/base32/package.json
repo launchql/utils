@@ -1,6 +1,6 @@
 {
   "name": "@launchql/base32",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "base32",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
