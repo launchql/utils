@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-utils",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "utils",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
