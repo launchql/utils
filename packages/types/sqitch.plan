@@ -8,7 +8,7 @@ schemas/public/domains/email [schemas/public/schema] 2017-08-11T08:11:51Z skitch
 schemas/public/domains/hostname [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/hostname
 schemas/public/domains/image [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/image
 schemas/public/domains/multiple_select [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/multiple_select
+schemas/public/domains/origin [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/origin
 schemas/public/domains/single_select [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/single_select
 schemas/public/domains/upload [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/upload
 schemas/public/domains/url [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/url
-schemas/public/types/origin [schemas/public/schema] 2021-01-10T02:38:13Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/public/types/origin
