@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-verify",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "verification utils",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
