@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-default-roles",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "description": "default roles",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
