@@ -1,4 +1,7 @@
 -- Deploy procedures/verify_membership to pg
+
+-- requires: procedures/list_memberships
+
 BEGIN;
 CREATE FUNCTION verify_membership (_user text, _role text)
     RETURNS boolean

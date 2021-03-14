@@ -145,7 +145,7 @@ CREATE TABLE status_public.levels (
 
 COMMENT ON TABLE status_public.levels IS E'Levels for achievement';
 
-GRANT SELECT ON TABLE status_public.levels TO authenticated;
+GRANT SELECT ON TABLE status_public.levels TO PUBLIC;
 
 CREATE TABLE status_public.level_requirements (
  	id uuid PRIMARY KEY DEFAULT ( uuid_generate_v4() ),

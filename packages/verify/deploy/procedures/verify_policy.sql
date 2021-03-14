@@ -1,5 +1,11 @@
 -- Deploy procedures/verify_policy to pg
+
+-- requires: procedures/get_entity_from_str 
+-- requires: procedures/get_schema_from_str 
+
+
 BEGIN;
+
 CREATE FUNCTION verify_policy (_policy text, _table text)
     RETURNS boolean
     AS $$

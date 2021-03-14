@@ -1,4 +1,5 @@
 -- Deploy procedures/get_entity_from_str to pg
+
 BEGIN;
 CREATE FUNCTION get_entity_from_str (qualified_name text)
     RETURNS text
@@ -18,4 +19,3 @@ $$
 LANGUAGE plpgsql
 STRICT;
 COMMIT;
-

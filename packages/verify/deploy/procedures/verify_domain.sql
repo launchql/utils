@@ -1,4 +1,8 @@
 -- Deploy procedures/verify_domain to pg
+
+-- requires: procedures/get_entity_from_str 
+-- requires: procedures/get_schema_from_str 
+
 BEGIN;
 CREATE FUNCTION verify_domain (_type text)
     RETURNS boolean

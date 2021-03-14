@@ -1,4 +1,8 @@
 -- Deploy procedures/verify_security to pg
+
+-- requires: procedures/get_entity_from_str 
+-- requires: procedures/get_schema_from_str 
+
 BEGIN;
 CREATE FUNCTION verify_security (_table text)
     RETURNS boolean

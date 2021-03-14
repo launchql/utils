@@ -1,4 +1,7 @@
 -- Deploy procedures/verify_index to pg
+
+-- requires: procedures/list_indexes
+
 BEGIN;
 CREATE FUNCTION verify_index (_table text, _index text)
     RETURNS boolean

@@ -6,7 +6,7 @@ BEGIN;
 
 CREATE TABLE status_public.user_steps (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-    user_id uuid  NOT NULL,
+    user_id uuid NOT NULL,
     name text NOT NULL, -- references level_requirement
     count int NOT NULL DEFAULT 1,
     created_at timestamptz NOT NULL DEFAULT current_timestamp

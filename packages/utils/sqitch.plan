@@ -1,9 +1,6 @@
 %syntax-version=1.0.0
-%project=launchql-ext-utils
-%uri=launchql-ext-utils
+%project=launchql-utils
+%uri=launchql-utils
   
-procedures/get_entity_from_str 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add procedures/get_entity_from_str
-procedures/get_schema_from_str 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add procedures/get_schema_from_str
-procedures/list_indexes [procedures/get_entity_from_str procedures/get_schema_from_str] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add procedures/list_indexes
-procedures/list_memberships 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add procedures/list_memberships
-procedures/tg_update_timestamps 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add procedures/tg_update_timestamps
+schemas/utils/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/utils/schema
+schemas/utils/procedures/mask_pad [schemas/utils/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/utils/procedures/mask_pad

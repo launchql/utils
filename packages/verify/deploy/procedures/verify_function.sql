@@ -1,4 +1,8 @@
 -- Deploy procedures/verify_function to pg
+
+-- requires: procedures/get_entity_from_str 
+-- requires: procedures/get_schema_from_str 
+
 BEGIN;
 CREATE FUNCTION verify_function (_name text, _user text DEFAULT NULL)
   RETURNS boolean

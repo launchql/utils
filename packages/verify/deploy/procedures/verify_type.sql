@@ -1,4 +1,9 @@
 -- Deploy procedures/verify_type to pg
+
+-- requires: procedures/get_entity_from_str 
+-- requires: procedures/get_schema_from_str 
+
+
 BEGIN;
 CREATE FUNCTION verify_type (_type text)
     RETURNS boolean
