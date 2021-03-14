@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-uuid",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "uuid",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
