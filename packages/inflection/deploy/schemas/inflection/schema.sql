@@ -12,4 +12,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA inflection
 GRANT EXECUTE ON FUNCTIONS
 TO public;
 
+GRANT EXECUTE ON FUNCTION public.unaccent(text, text) to public;
+GRANT EXECUTE ON FUNCTION public.unaccent(regdictionary, text) to public;
+
 COMMIT;
