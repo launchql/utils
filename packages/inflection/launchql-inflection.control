@@ -1,6 +1,6 @@
 # launchql-inflection extension
 comment = 'launchql-inflection extension'
-default_version = '0.1.24'
+default_version = '0.1.25'
 module_pathname = '$libdir/launchql-inflection'
 requires = 'plpgsql,unaccent,uuid-ossp'
 relocatable = false

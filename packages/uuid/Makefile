@@ -1,5 +1,5 @@
 EXTENSION = launchql-uuid
-DATA = sql/launchql-uuid--0.1.10.sql
+DATA = sql/launchql-uuid--0.1.11.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
