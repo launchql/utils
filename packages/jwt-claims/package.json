@@ -32,5 +32,6 @@
   },
   "dependencies": {
     "@launchql/ext-types": "^0.1.26"
-  }
+  },
+  "gitHead": "c3ac9a2deef34d3cebdd388b4019700e679bac7e"
 }

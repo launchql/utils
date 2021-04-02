@@ -32,5 +32,6 @@
   },
   "dependencies": {
     "@launchql/ext-jwt-claims": "^0.1.23"
-  }
+  },
+  "gitHead": "c3ac9a2deef34d3cebdd388b4019700e679bac7e"
 }
