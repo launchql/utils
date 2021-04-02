@@ -1,4 +1,6 @@
 \echo Use "CREATE EXTENSION launchql-uuid" to load this file. \quit
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO PUBLIC;
+
 CREATE SCHEMA uuids;
 
 GRANT USAGE ON SCHEMA uuids TO PUBLIC;

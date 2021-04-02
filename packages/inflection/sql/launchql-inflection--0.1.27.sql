@@ -1,4 +1,6 @@
 \echo Use "CREATE EXTENSION launchql-inflection" to load this file. \quit
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO PUBLIC;
+
 CREATE SCHEMA inflection;
 
 GRANT USAGE ON SCHEMA inflection TO PUBLIC;
