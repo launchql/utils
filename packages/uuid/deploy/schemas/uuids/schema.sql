@@ -1,5 +1,6 @@
 -- Deploy schemas/uuids/schema to pg
 
+-- requires: extension/defaults
 
 BEGIN;
 

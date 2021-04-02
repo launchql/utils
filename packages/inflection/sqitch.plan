@@ -2,7 +2,8 @@
 %project=launchql-inflection
 %uri=launchql-inflection
   
-schemas/inflection/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/inflection/schema
+extension/defaults 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add extension/defaults
+schemas/inflection/schema [extension/defaults] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/inflection/schema
 schemas/inflection/procedures/no_consecutive_caps [schemas/inflection/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/inflection/procedures/no_consecutive_caps
 schemas/inflection/procedures/pg_slugify [schemas/inflection/schema schemas/inflection/procedures/no_consecutive_caps] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/inflection/procedures/pg_slugify
 schemas/inflection/procedures/no_single_underscores [schemas/inflection/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/inflection/procedures/no_single_underscores

@@ -1,5 +1,6 @@
 -- Deploy schemas/inflection/schema to pg
 
+-- requires: extension/defaults
 
 BEGIN;
 
