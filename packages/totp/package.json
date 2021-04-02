@@ -1,6 +1,6 @@
 {
   "name": "@launchql/totp",
-  "version": "0.1.26",
+  "version": "0.1.27",
   "description": "totp",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
@@ -34,7 +34,7 @@
     "speakeasy": "2.0.0"
   },
   "dependencies": {
-    "@launchql/base32": "^0.1.26"
+    "@launchql/base32": "^0.1.27"
   },
   "gitHead": "c3ac9a2deef34d3cebdd388b4019700e679bac7e"
 }
