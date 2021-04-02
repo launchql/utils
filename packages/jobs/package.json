@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-jobs",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "description": "jobs",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
@@ -32,7 +32,7 @@
     "regenerator-runtime": "^0.13.2"
   },
   "dependencies": {
-    "@launchql/ext-default-roles": "^0.1.22",
-    "@launchql/ext-jwt-claims": "^0.1.19"
+    "@launchql/ext-default-roles": "^0.1.23",
+    "@launchql/ext-jwt-claims": "^0.1.20"
   }
 }
