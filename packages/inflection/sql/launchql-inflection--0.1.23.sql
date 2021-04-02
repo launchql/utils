@@ -6,6 +6,10 @@ GRANT USAGE ON SCHEMA inflection TO PUBLIC;
 ALTER DEFAULT PRIVILEGES IN SCHEMA inflection 
  GRANT EXECUTE ON FUNCTIONS  TO PUBLIC;
 
+GRANT EXECUTE ON FUNCTION public.unaccent ( text,text ) TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION public.unaccent ( regdictionary,text ) TO PUBLIC;
+
 CREATE FUNCTION inflection.no_consecutive_caps_till_end ( str text ) RETURNS text AS $EOFCODE$
 DECLARE
   result text[];
