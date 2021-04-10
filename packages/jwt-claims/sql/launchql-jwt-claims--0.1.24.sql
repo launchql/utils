@@ -134,21 +134,16 @@ END;
 $EOFCODE$ LANGUAGE plpgsql STABLE;
 
 CREATE FUNCTION jwt_public.current_user_id (  ) RETURNS uuid AS $EOFCODE$
-DECLARE
-  v_identifier_id uuid;
-BEGIN
-  IF current_setting('jwt.claims.user_id', TRUE)
-    IS NOT NULL THEN
-    BEGIN
-      v_identifier_id = current_setting('jwt.claims.user_id', TRUE)::uuid;
-    EXCEPTION
-      WHEN OTHERS THEN
-      RAISE NOTICE 'Invalid UUID value';
-    RETURN NULL;
-    END;
-    RETURN v_identifier_id;
-  ELSE
-    RETURN NULL;
-  END IF;
-END;
-$EOFCODE$ LANGUAGE plpgsql STABLE;
+  SELECT NULLIF(current_setting('jwt.claims.user_id', true), '')::uuid;
+$EOFCODE$ LANGUAGE sql STABLE;
+
+CREATE SCHEMA ctx;
+
+GRANT USAGE ON SCHEMA ctx TO authenticated, anonymous;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA ctx 
+ GRANT EXECUTE ON FUNCTIONS  TO authenticated;
+
+CREATE FUNCTION ctx.user_id (  ) RETURNS uuid AS $EOFCODE$
+  SELECT NULLIF(current_setting('jwt.claims.user_id', true), '')::uuid;
+$EOFCODE$ LANGUAGE sql STABLE;
