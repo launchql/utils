@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-stamps",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "stamps",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
@@ -31,7 +31,7 @@
     "regenerator-runtime": "^0.13.2"
   },
   "dependencies": {
-    "@launchql/ext-jwt-claims": "^0.1.25"
+    "@launchql/ext-jwt-claims": "^0.1.26"
   },
   "gitHead": "c3ac9a2deef34d3cebdd388b4019700e679bac7e"
 }
