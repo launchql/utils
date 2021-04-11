@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-jwt-claims",
-  "version": "0.1.27",
+  "version": "0.2.0",
   "description": "ext-jwt-claims",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
@@ -31,7 +31,7 @@
     "regenerator-runtime": "^0.13.2"
   },
   "dependencies": {
-    "@launchql/ext-types": "^0.1.29"
+    "@launchql/ext-types": "^0.2.0"
   },
   "gitHead": "c3ac9a2deef34d3cebdd388b4019700e679bac7e"
 }
