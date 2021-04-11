@@ -1,5 +1,5 @@
 EXTENSION = launchql-inflection
-DATA = sql/launchql-inflection--0.1.29.sql
+DATA = sql/launchql-inflection--0.1.30.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)

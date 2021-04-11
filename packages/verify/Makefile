@@ -1,5 +1,5 @@
 EXTENSION = launchql-ext-verify
-DATA = sql/launchql-ext-verify--0.1.29.sql
+DATA = sql/launchql-ext-verify--0.1.30.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
