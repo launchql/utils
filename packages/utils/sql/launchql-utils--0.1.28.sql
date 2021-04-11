@@ -27,3 +27,19 @@ CREATE FUNCTION utils.bitmask_pad ( bitstr pg_catalog.varbit, bitlen int, pad te
         lpad(bitstr::text, bitlen, pad)
       END)::varbit;
 $EOFCODE$ LANGUAGE sql;
+
+CREATE FUNCTION utils.throw (  ) RETURNS trigger AS $EOFCODE$
+BEGIN
+
+  IF (TG_NARGS = 1) THEN 
+    RAISE EXCEPTION '% (%)', TG_ARGV[0], TG_TABLE_NAME;
+  END IF;
+
+  IF (TG_NARGS > 1) THEN 
+    RAISE EXCEPTION '% (%, %)', TG_ARGV[0], TG_TABLE_NAME, TG_ARGV[1];
+  END IF;
+
+  RAISE EXCEPTION 'THROWN_ERROR (%)', TG_TABLE_NAME;
+
+END;
+$EOFCODE$ LANGUAGE plpgsql;

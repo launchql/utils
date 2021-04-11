@@ -145,5 +145,17 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA ctx
  GRANT EXECUTE ON FUNCTIONS  TO authenticated;
 
 CREATE FUNCTION ctx.user_id (  ) RETURNS uuid AS $EOFCODE$
-  SELECT NULLIF(current_setting('jwt.claims.user_id', true), '')::uuid;
+  SELECT current_setting('jwt.claims.user_id', true)::uuid;
+$EOFCODE$ LANGUAGE sql STABLE;
+
+CREATE FUNCTION ctx.ip_address (  ) RETURNS inet AS $EOFCODE$
+  SELECT current_setting('jwt.claims.ip_address', true)::inet;
+$EOFCODE$ LANGUAGE sql STABLE;
+
+CREATE FUNCTION ctx.origin (  ) RETURNS origin AS $EOFCODE$
+  SELECT current_setting('jwt.claims.origin', true)::origin;
+$EOFCODE$ LANGUAGE sql STABLE;
+
+CREATE FUNCTION ctx.user_agent (  ) RETURNS text AS $EOFCODE$
+  SELECT current_setting('jwt.claims.user_agent', true);
 $EOFCODE$ LANGUAGE sql STABLE;
