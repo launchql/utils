@@ -7,24 +7,8 @@ BEGIN;
 CREATE FUNCTION jwt_public.current_ip_address()
   RETURNS inet
 AS $$
-DECLARE
-  v_ip_addr inet;
-BEGIN
-  IF current_setting('jwt.claims.ip_address', TRUE)
-    IS NOT NULL THEN
-    BEGIN
-      v_ip_addr = trim(current_setting('jwt.claims.ip_address', TRUE))::inet;
-    EXCEPTION
-      WHEN OTHERS THEN
-      RAISE NOTICE 'Invalid IP';
-    RETURN NULL;
-    END;
-    RETURN v_ip_addr;
-  ELSE
-    RETURN NULL;
-  END IF;
-END;
+  SELECT current_setting('jwt.claims.ip_address', true)::inet;
 $$
-LANGUAGE 'plpgsql' STABLE;
+LANGUAGE 'sql' STABLE;
 
 COMMIT;

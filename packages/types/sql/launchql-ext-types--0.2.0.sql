@@ -34,12 +34,3 @@ COMMENT ON DOMAIN upload IS E'@name launchqlInternalTypeUpload';
 CREATE DOMAIN url AS text CHECK ( value ~ '^(https?)://[^\s/$.?#].[^\s]*$' );
 
 COMMENT ON DOMAIN url IS E'@name launchqlInternalTypeUrl';
-
-CREATE FUNCTION immutable_field_trigger (  ) RETURNS trigger AS $EOFCODE$
-BEGIN
-  IF TG_NARGS > 0 THEN
-    RAISE EXCEPTION 'IMMUTABLE_PROPERTY %', TG_ARGV[0];
-  END IF;
-  RAISE EXCEPTION 'IMMUTABLE_PROPERTY';
-END;
-$EOFCODE$ LANGUAGE plpgsql;
