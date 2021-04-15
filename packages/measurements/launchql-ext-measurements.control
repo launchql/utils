@@ -1,6 +1,6 @@
 # launchql-ext-measurements extension
 comment = 'launchql-ext-measurements extension'
-default_version = '0.1.0'
+default_version = '0.1.1'
 module_pathname = '$libdir/launchql-ext-measurements'
 requires = 'plpgsql'
 relocatable = false
