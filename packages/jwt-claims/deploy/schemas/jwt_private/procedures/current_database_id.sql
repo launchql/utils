@@ -7,7 +7,7 @@ BEGIN;
 CREATE FUNCTION jwt_private.current_database_id()
   RETURNS uuid
 AS $$
-  SELECT current_setting('jwt.claims.database_id', true)::uuid;
+  SELECT nullif(current_setting('jwt.claims.database_id', true), '')::uuid;
 $$
 LANGUAGE 'sql' STABLE;
 

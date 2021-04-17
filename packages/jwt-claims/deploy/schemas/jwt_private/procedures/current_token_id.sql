@@ -7,7 +7,7 @@ BEGIN;
 CREATE FUNCTION jwt_private.current_token_id()
   RETURNS uuid
 AS $$
-  SELECT current_setting('jwt.claims.token_id', true)::uuid;
+  SELECT nullif(current_setting('jwt.claims.token_id', true), '')::uuid;
 $$
 LANGUAGE 'sql' STABLE;
 

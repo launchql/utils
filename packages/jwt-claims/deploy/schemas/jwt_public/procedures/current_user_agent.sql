@@ -7,7 +7,7 @@ BEGIN;
 CREATE FUNCTION jwt_public.current_user_agent()
   RETURNS text
 AS $$
-  SELECT current_setting('jwt.claims.user_agent', true);
+  SELECT nullif(current_setting('jwt.claims.user_agent', true), '');
 $$
 LANGUAGE 'sql' STABLE;
 

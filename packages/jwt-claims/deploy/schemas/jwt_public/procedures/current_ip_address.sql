@@ -7,7 +7,7 @@ BEGIN;
 CREATE FUNCTION jwt_public.current_ip_address()
   RETURNS inet
 AS $$
-  SELECT current_setting('jwt.claims.ip_address', true)::inet;
+  SELECT nullif(current_setting('jwt.claims.ip_address', true), '')::inet;
 $$
 LANGUAGE 'sql' STABLE;
 

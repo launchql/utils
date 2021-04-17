@@ -7,7 +7,7 @@ BEGIN;
 CREATE FUNCTION ctx.origin()
   RETURNS origin
 AS $$
-  SELECT current_setting('jwt.claims.origin', true)::origin;
+  SELECT nullif(current_setting('jwt.claims.origin', true), '')::origin;
 $$
 LANGUAGE 'sql' STABLE;
 

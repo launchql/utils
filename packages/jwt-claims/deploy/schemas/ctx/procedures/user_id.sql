@@ -7,7 +7,7 @@ BEGIN;
 CREATE FUNCTION ctx.user_id()
   RETURNS uuid
 AS $$
-  SELECT current_setting('jwt.claims.user_id', true)::uuid;
+  SELECT nullif(current_setting('jwt.claims.user_id', true), '')::uuid;
 $$
 LANGUAGE 'sql' STABLE;
 
