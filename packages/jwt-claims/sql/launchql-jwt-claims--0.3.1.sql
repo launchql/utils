@@ -7,19 +7,19 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA ctx
  GRANT EXECUTE ON FUNCTIONS  TO authenticated;
 
 CREATE FUNCTION ctx.ip_address (  ) RETURNS inet AS $EOFCODE$
-  SELECT current_setting('jwt.claims.ip_address', true)::inet;
+  SELECT nullif(current_setting('jwt.claims.ip_address', true), '')::inet;
 $EOFCODE$ LANGUAGE sql STABLE;
 
 CREATE FUNCTION ctx.origin (  ) RETURNS origin AS $EOFCODE$
-  SELECT current_setting('jwt.claims.origin', true)::origin;
+  SELECT nullif(current_setting('jwt.claims.origin', true), '')::origin;
 $EOFCODE$ LANGUAGE sql STABLE;
 
 CREATE FUNCTION ctx.user_agent (  ) RETURNS text AS $EOFCODE$
-  SELECT current_setting('jwt.claims.user_agent', true);
+  SELECT nullif(current_setting('jwt.claims.user_agent', true), '');
 $EOFCODE$ LANGUAGE sql STABLE;
 
 CREATE FUNCTION ctx.user_id (  ) RETURNS uuid AS $EOFCODE$
-  SELECT current_setting('jwt.claims.user_id', true)::uuid;
+  SELECT nullif(current_setting('jwt.claims.user_id', true), '')::uuid;
 $EOFCODE$ LANGUAGE sql STABLE;
 
 CREATE SCHEMA jwt_private;
@@ -30,11 +30,11 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA jwt_private
  GRANT EXECUTE ON FUNCTIONS  TO authenticated;
 
 CREATE FUNCTION jwt_private.current_database_id (  ) RETURNS uuid AS $EOFCODE$
-  SELECT current_setting('jwt.claims.database_id', true)::uuid;
+  SELECT nullif(current_setting('jwt.claims.database_id', true), '')::uuid;
 $EOFCODE$ LANGUAGE sql STABLE;
 
 CREATE FUNCTION jwt_private.current_token_id (  ) RETURNS uuid AS $EOFCODE$
-  SELECT current_setting('jwt.claims.token_id', true)::uuid;
+  SELECT nullif(current_setting('jwt.claims.token_id', true), '')::uuid;
 $EOFCODE$ LANGUAGE sql STABLE;
 
 CREATE SCHEMA jwt_public;
@@ -45,17 +45,17 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA jwt_public
  GRANT EXECUTE ON FUNCTIONS  TO authenticated;
 
 CREATE FUNCTION jwt_public.current_ip_address (  ) RETURNS inet AS $EOFCODE$
-  SELECT current_setting('jwt.claims.ip_address', true)::inet;
+  SELECT nullif(current_setting('jwt.claims.ip_address', true), '')::inet;
 $EOFCODE$ LANGUAGE sql STABLE;
 
 CREATE FUNCTION jwt_public.current_origin (  ) RETURNS origin AS $EOFCODE$
-  SELECT current_setting('jwt.claims.origin', true)::origin;
+  SELECT nullif(current_setting('jwt.claims.origin', true), '')::origin;
 $EOFCODE$ LANGUAGE sql STABLE;
 
 CREATE FUNCTION jwt_public.current_user_agent (  ) RETURNS text AS $EOFCODE$
-  SELECT current_setting('jwt.claims.user_agent', true);
+  SELECT nullif(current_setting('jwt.claims.user_agent', true), '');
 $EOFCODE$ LANGUAGE sql STABLE;
 
 CREATE FUNCTION jwt_public.current_user_id (  ) RETURNS uuid AS $EOFCODE$
-  SELECT current_setting('jwt.claims.user_id', true)::uuid;
+  SELECT nullif(current_setting('jwt.claims.user_id', true), '')::uuid;
 $EOFCODE$ LANGUAGE sql STABLE;
