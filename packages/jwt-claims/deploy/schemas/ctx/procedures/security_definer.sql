@@ -10,11 +10,11 @@ DO $LQLMIGRATION$
     EXECUTE format('CREATE FUNCTION ctx.security_definer() returns text as $$
       SELECT ''%s'';
 $$
-LANGUAGE ''sql'' STABLE;', current_user);
+LANGUAGE ''sql'';', current_user);
     EXECUTE format('CREATE FUNCTION ctx.is_security_definer() returns bool as $$
       SELECT ''%s'' = current_user;
 $$
-LANGUAGE ''sql'' STABLE;', current_user);
+LANGUAGE ''sql'';', current_user);
   END;
 $LQLMIGRATION$;
 GRANT EXECUTE ON FUNCTION ctx.security_definer() TO PUBLIC;
