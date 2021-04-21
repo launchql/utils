@@ -1,5 +1,5 @@
 EXTENSION = launchql-totp
-DATA = sql/launchql-totp--0.3.2.sql
+DATA = sql/launchql-totp--0.3.3.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
