@@ -1,6 +1,6 @@
 {
   "name": "@launchql/ext-achievements",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "achievements",
   "author": "Web, Inc. <pyramation@gmail.com>",
   "publishConfig": {
@@ -31,7 +31,7 @@
     "regenerator-runtime": "^0.13.2"
   },
   "dependencies": {
-    "@launchql/ext-jwt-claims": "^0.3.3"
+    "@launchql/ext-jwt-claims": "^0.3.4"
   },
   "gitHead": "c3ac9a2deef34d3cebdd388b4019700e679bac7e"
 }
