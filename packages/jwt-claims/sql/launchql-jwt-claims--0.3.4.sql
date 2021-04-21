@@ -59,3 +59,20 @@ $EOFCODE$ LANGUAGE sql STABLE;
 CREATE FUNCTION jwt_public.current_user_id (  ) RETURNS uuid AS $EOFCODE$
   SELECT nullif(current_setting('jwt.claims.user_id', true), '')::uuid;
 $EOFCODE$ LANGUAGE sql STABLE;
+
+DO $$
+  DECLARE
+  BEGIN
+    EXECUTE format('CREATE FUNCTION ctx.security_definer() returns text as $FUNC$
+      SELECT ''%s'';
+$FUNC$
+LANGUAGE ''sql'';', current_user);
+    EXECUTE format('CREATE FUNCTION ctx.is_security_definer() returns bool as $FUNC$
+      SELECT ''%s'' = current_user;
+$FUNC$
+LANGUAGE ''sql'';', current_user);
+  END; $$;
+
+GRANT EXECUTE ON FUNCTION ctx.security_definer TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION ctx.is_security_definer TO PUBLIC;

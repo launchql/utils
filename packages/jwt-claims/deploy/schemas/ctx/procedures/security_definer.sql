@@ -7,13 +7,13 @@ BEGIN;
 DO $LQLMIGRATION$
   DECLARE
   BEGIN
-    EXECUTE format('CREATE FUNCTION ctx.security_definer() returns text as $$
+    EXECUTE format('CREATE FUNCTION ctx.security_definer() returns text as $FUNC$
       SELECT ''%s'';
-$$
+$FUNC$
 LANGUAGE ''sql'';', current_user);
-    EXECUTE format('CREATE FUNCTION ctx.is_security_definer() returns bool as $$
+    EXECUTE format('CREATE FUNCTION ctx.is_security_definer() returns bool as $FUNC$
       SELECT ''%s'' = current_user;
-$$
+$FUNC$
 LANGUAGE ''sql'';', current_user);
   END;
 $LQLMIGRATION$;
