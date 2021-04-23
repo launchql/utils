@@ -7,6 +7,14 @@ CREATE DOMAIN email AS citext CHECK ( value ~ '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]
 
 COMMENT ON DOMAIN email IS E'@name launchqlInternalTypeEmail';
 
+CREATE DOMAIN geolocation AS geometry(point, 4326);
+
+COMMENT ON DOMAIN geolocation IS E'@name launchqlInternalTypeGeoLocation';
+
+CREATE DOMAIN geopolygon AS geometry(polygon, 4326);
+
+COMMENT ON DOMAIN geopolygon IS E'@name launchqlInternalTypeGeoPolygon';
+
 CREATE DOMAIN hostname AS text CHECK ( value ~ '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$' );
 
 COMMENT ON DOMAIN hostname IS E'@name launchqlInternalTypeHostname';
