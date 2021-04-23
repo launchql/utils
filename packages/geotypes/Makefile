@@ -1,5 +1,5 @@
-EXTENSION = launchql-ext-types
-DATA = sql/launchql-ext-types--0.4.1.sql
+EXTENSION = launchql-geo-types
+DATA = sql/launchql-geo-types--0.4.4.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
