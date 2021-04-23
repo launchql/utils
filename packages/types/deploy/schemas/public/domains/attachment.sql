@@ -2,11 +2,10 @@
 -- requires: schemas/public/schema
 
 BEGIN;
-CREATE DOMAIN attachment AS jsonb CHECK (
-  value ?& ARRAY['url', 'mime']
-  AND
-  value->>'url' ~ '^(https?)://[^\s/$.?#].[^\s]*$'
-);
+
+
+CREATE DOMAIN attachment AS text CHECK (VALUE ~ '^(https?)://[^\s/$.?#].[^\s]*$');
 COMMENT ON DOMAIN attachment IS E'@name launchqlInternalTypeAttachment';
+
 COMMIT;
 
