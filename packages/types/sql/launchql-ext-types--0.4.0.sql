@@ -1,5 +1,5 @@
 \echo Use "CREATE EXTENSION launchql-ext-types" to load this file. \quit
-CREATE DOMAIN attachment AS jsonb CHECK ( value ?& ARRAY['url', 'mime'] AND (value->>'url') ~ '^(https?)://[^\s/$.?#].[^\s]*$' );
+CREATE DOMAIN attachment AS text CHECK ( value ~ '^(https?)://[^\s/$.?#].[^\s]*$' );
 
 COMMENT ON DOMAIN attachment IS E'@name launchqlInternalTypeAttachment';
 
@@ -27,7 +27,7 @@ CREATE DOMAIN single_select AS jsonb CHECK ( value ?& ARRAY['value'] );
 
 COMMENT ON DOMAIN single_select IS E'@name launchqlInternalTypeSingleSelect';
 
-CREATE DOMAIN upload AS text CHECK ( value ~ '^(https?)://[^\s/$.?#].[^\s]*$' );
+CREATE DOMAIN upload AS jsonb CHECK ( value ?& ARRAY['url', 'mime'] AND (value->>'url') ~ '^(https?)://[^\s/$.?#].[^\s]*$' );
 
 COMMENT ON DOMAIN upload IS E'@name launchqlInternalTypeUpload';
 

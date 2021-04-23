@@ -12,3 +12,5 @@ schemas/public/domains/origin [schemas/public/schema] 2017-08-11T08:11:51Z skitc
 schemas/public/domains/single_select [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/single_select
 schemas/public/domains/upload [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/upload
 schemas/public/domains/url [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/url
+schemas/public/types/location [schemas/public/schema] 2021-04-23T05:07:13Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/public/types/location
+schemas/public/types/geopolygon [schemas/public/schema] 2021-04-23T05:08:25Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/public/types/geopolygon

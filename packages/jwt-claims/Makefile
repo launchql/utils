@@ -1,5 +1,5 @@
 EXTENSION = launchql-jwt-claims
-DATA = sql/launchql-jwt-claims--0.3.6.sql
+DATA = sql/launchql-jwt-claims--0.4.0.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
