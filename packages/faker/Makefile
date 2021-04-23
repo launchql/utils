@@ -1,5 +1,5 @@
 EXTENSION = launchql-faker
-DATA = sql/launchql-faker--0.3.5.sql
+DATA = sql/launchql-faker--0.3.6.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)

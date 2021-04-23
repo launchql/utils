@@ -1,6 +1,6 @@
 # launchql-ext-default-roles extension
 comment = 'launchql-ext-default-roles extension'
-default_version = '0.3.5'
+default_version = '0.3.6'
 module_pathname = '$libdir/launchql-ext-default-roles'
 requires = 'plpgsql'
 relocatable = false

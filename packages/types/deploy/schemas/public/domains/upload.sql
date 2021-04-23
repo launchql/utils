@@ -11,4 +11,4 @@ CREATE DOMAIN upload AS jsonb CHECK (
 );
 COMMENT ON DOMAIN upload IS E'@name launchqlInternalTypeUpload';
 
-sCOMMIT;
+COMMIT;
