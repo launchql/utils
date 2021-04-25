@@ -1,6 +1,6 @@
 {
   "name": "@launchql/geo-types",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "types",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "publishConfig": {
