@@ -39,7 +39,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: deps
-        run: yarn --ignore-engines
+        run: |
+          apt-get update && apt-get install -y python2
+          ln -sf /usr/bin/python2 /usr/bin/python
+          yarn --ignore-engines
 
       - name: build
         run: yarn build
