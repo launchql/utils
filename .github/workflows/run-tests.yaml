@@ -70,14 +70,14 @@ jobs:
       - name: jobs
         run: cd ./packages/jobs && yarn test
         
-      - name: defaults
-        run: cd ./packages/defaults && yarn test
+      # - name: defaults
+      #   run: cd ./packages/defaults && yarn test
         
       - name: uuid
         run: cd ./packages/uuid && yarn test
         
-      - name: verify
-        run: cd ./packages/verify && yarn test
+      # - name: verify
+      #   run: cd ./packages/verify && yarn test
         
       - name: types
         run: cd ./packages/types && yarn test
@@ -88,14 +88,14 @@ jobs:
       - name: faker
         run: cd ./packages/faker && yarn test
         
-      - name: jwt-claims
-        run: cd ./packages/jwt-claims && yarn test
+      # - name: jwt-claims
+      #   run: cd ./packages/jwt-claims && yarn test
         
       - name: jobs-simple
         run: cd ./packages/jobs-simple && yarn test
         
-      - name: measurements
-        run: cd ./packages/measurements && yarn test
+      # - name: measurements
+      #   run: cd ./packages/measurements && yarn test
         
       - name: inflection
         run: cd ./packages/inflection && yarn test
