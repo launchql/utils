@@ -15,6 +15,7 @@ jobs:
       PGPASSWORD: password
       NODE_OPTIONS: --openssl-legacy-provider
       PYTHON: /usr/bin/python3
+      NODE_GYP_FORCE_PYTHON: /usr/bin/python3
 
     services:
       pg_db:
@@ -41,13 +42,23 @@ jobs:
 
       - name: deps
         run: |
-          which python3 || echo "Python3 not found"
-          ln -sf $(which python3) /usr/bin/python || echo "Cannot create symlink"
+          which python3
+          ln -sf $(which python3) /usr/bin/python
+          npm config set python /usr/bin/python3
+          yarn config set python /usr/bin/python3
           yarn --ignore-engines
+          
+      - name: rebuild native modules
+        run: |
+          cd node_modules/libpg-query || echo "libpg-query not found"
+          if [ -d "." ]; then
+            PYTHON=/usr/bin/python3 node-gyp rebuild
+          fi
+          cd ../..
           
       - name: build
         run: |
-          PYTHON=/usr/bin/python3 yarn build
+          NODE_GYP_FORCE_PYTHON=/usr/bin/python3 PYTHON=/usr/bin/python3 yarn build
 
       - name: seed app_user
         run: |
