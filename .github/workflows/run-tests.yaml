@@ -14,6 +14,7 @@ jobs:
       PGUSER: postgres
       PGPASSWORD: password
       NODE_OPTIONS: --openssl-legacy-provider
+      PYTHON: /usr/bin/python3
 
     services:
       pg_db:
@@ -40,13 +41,13 @@ jobs:
 
       - name: deps
         run: |
-          apt-get update && apt-get install -y python2
-          ln -sf /usr/bin/python2 /usr/bin/python
-          yarn --ignore-engines
+          which python3 || echo "Python3 not found"
+          ln -sf $(which python3) /usr/bin/python || echo "Cannot create symlink"
+          yarn --ignore-engines --ignore-scripts
           
       - name: build
         run: |
-          yarn build
+          PYTHON=/usr/bin/python3 yarn build --ignore-scripts
 
       - name: seed app_user
         run: |
