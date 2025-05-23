@@ -1,6 +1,6 @@
 {
-  "lerna": "3.4.2",
-  "useWorkspaces": true,
+  "lerna": "6",
+  "conventionalCommits": true,
   "npmClient": "yarn",
   "npmClientArgs": [
     "--no-lockfile"
@@ -12,11 +12,13 @@
   "registry": "https://registry.npmjs.org",
   "command": {
     "create": {
-      "license": "SEE LICENSE IN LICENSE",
-      "access": "public"
+      "homepage": "https://github.com/launchql/utils",
+      "license": "MIT",
+      "access": "restricted"
     },
     "publish": {
-      "allowBranch": "master"
+      "allowBranch": "main",
+      "message": "chore(release): publish"
     }
   }
 }
