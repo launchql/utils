@@ -47,7 +47,7 @@ jobs:
           
       - name: build
         run: |
-          PYTHON=/usr/bin/python3 yarn build --ignore-scripts
+          PYTHON=/usr/bin/python3 yarn build
 
       - name: seed app_user
         run: |
