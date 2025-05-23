@@ -43,7 +43,7 @@ jobs:
         run: |
           which python3 || echo "Python3 not found"
           ln -sf $(which python3) /usr/bin/python || echo "Cannot create symlink"
-          yarn --ignore-engines --ignore-scripts
+          yarn --ignore-engines
           
       - name: build
         run: |
