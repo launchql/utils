@@ -1,18 +1,16 @@
-import { getConnections } from './utils';
+import { getConnections, PgTestClient } from 'pgsql-test';
 
-let db, utils, teardown;
-const objs = {
-  tables: {}
-};
+let db: PgTestClient;
+let pg: PgTestClient;
+let teardown: () => Promise<void>;
 
 beforeAll(async () => {
-  ({ db, teardown } = await getConnections());
-  utils = db.helper('utils');
+  ({ db, pg, teardown } = await getConnections());
 });
 
 afterAll(async () => {
   try {
-    //try catch here allows us to see the sql parsing issues!
+    // try catch here allows us to see the sql parsing issues!
     await teardown();
   } catch (e) {
     // noop
@@ -20,38 +18,39 @@ afterAll(async () => {
   }
 });
 
-beforeEach(async () => {
-  await db.beforeEach();
-});
-
-afterEach(async () => {
-  await db.afterEach();
-});
+beforeEach(() => db.beforeEach());
+afterEach(() => db.afterEach());
 
 it('more', async () => {
-  const [result] = await utils.callAny('mask_pad', { mask: '101', num: 20 });
-  expect(result).toMatchSnapshot();
+  const { mask_pad } = await db.one(
+    `SELECT utils.mask_pad($1, $2) AS mask_pad`,
+    ['101', 20]
+  );
+  expect(mask_pad).toMatchSnapshot();
 });
 
 it('less', async () => {
-  const [result] = await utils.callAny('mask_pad', { mask: '101', num: 2 });
-  expect(result).toMatchSnapshot();
+  const { mask_pad } = await db.one(
+    `SELECT utils.mask_pad($1, $2) AS mask_pad`,
+    ['101', 2]
+  );
+  expect(mask_pad).toMatchSnapshot();
 });
 
 describe('bitmask', () => {
   it('more', async () => {
-    const [result] = await utils.callAny('bitmask_pad', {
-      mask: '101',
-      num: 20
-    });
-    expect(result).toMatchSnapshot();
+    const { bitmask_pad } = await db.one(
+      `SELECT utils.bitmask_pad($1::varbit, $2) AS bitmask_pad`,
+      ['101', 20]
+    );
+    expect(bitmask_pad).toMatchSnapshot();
   });
 
   it('less', async () => {
-    const [result] = await utils.callAny('bitmask_pad', {
-      mask: '101',
-      num: 2
-    });
-    expect(result).toMatchSnapshot();
+    const { bitmask_pad } = await db.one(
+      `SELECT utils.bitmask_pad($1::varbit, $2) AS bitmask_pad`,
+      ['101', 2]
+    );
+    expect(bitmask_pad).toMatchSnapshot();
   });
 });

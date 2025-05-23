@@ -703,7 +703,7 @@ END;
 $$
 LANGUAGE 'plpgsql' VOLATILE;
 
-CREATE FUNCTION faker.upload(mime text default null) returns upload as $$
+CREATE FUNCTION faker.attachment(mime text default null) returns attachment as $$
 BEGIN
   RETURN faker.url(mime);
 END;
@@ -723,7 +723,7 @@ END;
 $$
 LANGUAGE 'plpgsql' VOLATILE;
 
-CREATE FUNCTION faker.attachment(mime text default null) returns attachment as $$
+CREATE FUNCTION faker.upload(mime text default null) returns upload as $$
 DECLARE
   obj jsonb = '{}'::jsonb;
 BEGIN

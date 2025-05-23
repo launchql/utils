@@ -1,74 +1,37 @@
-import { getConnections } from './utils';
+import { getConnections, PgTestClient } from 'pgsql-test';
 import cases from 'jest-in-case';
 
-let db, base32, teardown;
-const objs = {
-  tables: {}
-};
+let db: PgTestClient;
+let pg: PgTestClient;
+let teardown: () => Promise<void>;
 
 beforeAll(async () => {
-  ({ db, teardown } = await getConnections());
-  base32 = db.helper('base32');
+  ({ db, pg, teardown } = await getConnections());
 });
 
 afterAll(async () => {
   try {
-    //try catch here allows us to see the sql parsing issues!
     await teardown();
-  } catch (e) {
-    // noop
+  } catch {
+    // ignore teardown issues
   }
 });
 
-beforeEach(async () => {
-  await db.beforeEach();
-});
-
-afterEach(async () => {
-  await db.afterEach();
-});
+beforeEach(() => pg.beforeEach());
+afterEach(() => pg.afterEach());
 
 it('base32_to_decimal', async () => {
-  const [{ base32_to_decimal }] = await base32.call('base32_to_decimal', {
-    input: 'INQXI==='
-  });
-  expect(base32_to_decimal).toEqual([
-    '8',
-    '13',
-    '16',
-    '23',
-    '8',
-    '=',
-    '=',
-    '='
-  ]);
-});
-
-it('base32_to_decimal', async () => {
-  const [{ base32_to_decimal }] = await base32.call('base32_to_decimal', {
-    input: 'INQXI==='
-  });
-  expect(base32_to_decimal).toEqual([
-    '8',
-    '13',
-    '16',
-    '23',
-    '8',
-    '=',
-    '=',
-    '='
-  ]);
+  const { base32_to_decimal } = await pg.one(
+    `SELECT base32.base32_to_decimal($1::text) AS base32_to_decimal`,
+    ['INQXI===']
+  );
+  expect(base32_to_decimal).toEqual(['8', '13', '16', '23', '8', '=', '=', '=']);
 });
 
 it('decimal_to_chunks', async () => {
-  const [{ decimal_to_chunks }] = await base32.call(
-    'decimal_to_chunks',
-    {
-      input: ['8', '13', '16', '23', '8', '=', '=', '=']
-    },
-    {
-      input: 'text[]'
-    }
+  const { decimal_to_chunks } = await pg.one(
+    `SELECT base32.decimal_to_chunks($1::text[]) AS decimal_to_chunks`,
+    [['8', '13', '16', '23', '8', '=', '=', '=']]
   );
   expect(decimal_to_chunks).toEqual([
     '01000',
@@ -83,44 +46,46 @@ it('decimal_to_chunks', async () => {
 });
 
 it('decode', async () => {
-  const [{ decode }] = await base32.call('decode', {
-    input: 'INQXI'
-  });
+  const { decode } = await pg.one(
+    `SELECT base32.decode($1::text) AS decode`,
+    ['INQXI']
+  );
   expect(decode).toEqual('Cat');
 });
 
 it('zero_fill', async () => {
-  const [{ zero_fill }] = await base32.call('zero_fill', {
-    a: 300,
-    b: 2
-  });
+  const { zero_fill } = await pg.one(
+    `SELECT base32.zero_fill($1::int, $2::int) AS zero_fill`,
+    [300, 2]
+  );
   expect(zero_fill).toBe('75');
 });
 
 it('zero_fill (-)', async () => {
-  const [{ zero_fill }] = await base32.call('zero_fill', {
-    a: -300,
-    b: 2
-  });
+  const { zero_fill } = await pg.one(
+    `SELECT base32.zero_fill($1::int, $2::int) AS zero_fill`,
+    [-300, 2]
+  );
   expect(zero_fill).toBe('1073741749');
 });
 
 it('zero_fill (0)', async () => {
-  const [{ zero_fill }] = await base32.call('zero_fill', {
-    a: -300,
-    b: 0
-  });
+  const { zero_fill } = await pg.one(
+    `SELECT base32.zero_fill($1::int, $2::int) AS zero_fill`,
+    [-300, 0]
+  );
   expect(zero_fill).toBe('4294966996');
 });
 
 cases(
-  'base32',
+  'base32.decode cases',
   async (opts) => {
-    const [result] = await base32.call('decode', {
-      input: opts.name
-    });
-    expect(result.decode).toEqual(opts.result);
-    expect(result.decode).toMatchSnapshot();
+    const { decode } = await pg.one(
+      `SELECT base32.decode($1::text) AS decode`,
+      [opts.name]
+    );
+    expect(decode).toEqual(opts.result);
+    expect(decode).toMatchSnapshot();
   },
   [
     { result: '', name: '' },

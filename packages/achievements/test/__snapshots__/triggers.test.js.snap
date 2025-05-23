@@ -1,15 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`newbie 1`] = `
-Object {
-  "beforeInsert": Array [],
+{
+  "beforeInsert": [],
 }
 `;
 
 exports[`newbie 2`] = `
-Object {
-  "afterFirstInsert": Array [
-    Object {
+{
+  "afterFirstInsert": [
+    {
       "count": 1,
       "created_at": "[DATE]",
       "id": "[ID]",
@@ -21,16 +21,16 @@ Object {
 `;
 
 exports[`newbie 3`] = `
-Object {
-  "afterUpdateToggleToValue": Array [
-    Object {
+{
+  "afterUpdateToggleToValue": [
+    {
       "count": 1,
       "created_at": "[DATE]",
       "id": "[ID]",
       "name": "tg_achievement",
       "user_id": "[ID]",
     },
-    Object {
+    {
       "count": 1,
       "created_at": "[DATE]",
       "id": "[ID]",
@@ -42,9 +42,9 @@ Object {
 `;
 
 exports[`newbie 4`] = `
-Object {
-  "afterUpdateToggleToNull": Array [
-    Object {
+{
+  "afterUpdateToggleToNull": [
+    {
       "count": 1,
       "created_at": "[DATE]",
       "id": "[ID]",
@@ -56,16 +56,16 @@ Object {
 `;
 
 exports[`newbie 5`] = `
-Object {
-  "afterIsVerifiedIsTrue": Array [
-    Object {
+{
+  "afterIsVerifiedIsTrue": [
+    {
       "count": 1,
       "created_at": "[DATE]",
       "id": "[ID]",
       "name": "tg_achievement",
       "user_id": "[ID]",
     },
-    Object {
+    {
       "count": 1,
       "created_at": "[DATE]",
       "id": "[ID]",
@@ -77,9 +77,9 @@ Object {
 `;
 
 exports[`newbie 6`] = `
-Object {
-  "afterIsVerifiedIsFalse": Array [
-    Object {
+{
+  "afterIsVerifiedIsFalse": [
+    {
       "count": 1,
       "created_at": "[DATE]",
       "id": "[ID]",
@@ -91,16 +91,16 @@ Object {
 `;
 
 exports[`newbie 7`] = `
-Object {
-  "afterIsApprovedTrue": Array [
-    Object {
+{
+  "afterIsApprovedTrue": [
+    {
       "count": 1,
       "created_at": "[DATE]",
       "id": "[ID]",
       "name": "tg_achievement",
       "user_id": "[ID]",
     },
-    Object {
+    {
       "count": 1,
       "created_at": "[DATE]",
       "id": "[ID]",

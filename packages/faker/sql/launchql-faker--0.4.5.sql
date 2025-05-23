@@ -658,7 +658,7 @@ BEGIN
 END;
 $EOFCODE$ LANGUAGE plpgsql VOLATILE;
 
-CREATE FUNCTION faker.upload ( mime text DEFAULT NULL ) RETURNS upload AS $EOFCODE$
+CREATE FUNCTION faker.attachment ( mime text DEFAULT NULL ) RETURNS attachment AS $EOFCODE$
 BEGIN
   RETURN faker.url(mime);
 END;
@@ -676,7 +676,7 @@ BEGIN
 END;
 $EOFCODE$ LANGUAGE plpgsql VOLATILE;
 
-CREATE FUNCTION faker.attachment ( mime text DEFAULT NULL ) RETURNS attachment AS $EOFCODE$
+CREATE FUNCTION faker.upload ( mime text DEFAULT NULL ) RETURNS upload AS $EOFCODE$
 DECLARE
   obj jsonb = '{}'::jsonb;
 BEGIN

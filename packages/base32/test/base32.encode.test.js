@@ -1,46 +1,36 @@
-import { getConnections } from './utils';
+import { getConnections, PgTestClient } from 'pgsql-test';
 import cases from 'jest-in-case';
 
-let db, base32, teardown;
-const objs = {
-  tables: {}
-};
+let db: PgTestClient;
+let pg: PgTestClient;
+let teardown: () => Promise<void>;
 
 beforeAll(async () => {
-  ({ db, teardown } = await getConnections());
-  base32 = db.helper('base32');
+  ({ db, pg, teardown } = await getConnections());
 });
 
 afterAll(async () => {
   try {
-    //try catch here allows us to see the sql parsing issues!
     await teardown();
-  } catch (e) {
-    // noop
+  } catch {
+    // allow teardown failures silently for debug visibility
   }
 });
 
-beforeEach(async () => {
-  await db.beforeEach();
-});
-
-afterEach(async () => {
-  await db.afterEach();
-});
+beforeEach(() => pg.beforeEach());
+afterEach(() => pg.afterEach());
 
 /*
   input: Cat (with a cap C)
 
-  
   ASCII decimal values [67,97,116]
   Binary format [01000011, 01100001, 01110100]
 
- 
   (BYTE = 8 bits)
 
   convert an input byte stream into group of 5 bytes
   if there are less than 5, adding padding
- 
+
   [01000011, 01100001, 01110100, xxxxxxxx, xxxxxxxx]
 
   break these into 5 bit chunks (5 * 8 = 40 bits, when we 40/5 = 8 new elements of 5 bits each)
@@ -53,16 +43,10 @@ afterEach(async () => {
 
   convert to decimal value
 
-  [01000, 01101, 10000, 10111, 01000, xxxxx, xxxxx, xxxxx]
-  [0b01000, 0b01101, 0b10000, 0b10111, 0b01000, xxxxx, xxxxx, xxxxx]
-  
-  convert to decimal value
-  
   [ 8, 13, 16, 23, 8, '=', '=', '=' ]
-  
-  
+
   Table 3: The Base 32 Alphabet
-  
+
   Value Encoding  Value Encoding  Value Encoding  Value Encoding
   0 A             9 J            18 S            27 3
   1 B            10 K            19 T            28 4
@@ -73,46 +57,36 @@ afterEach(async () => {
   6 G            15 P            24 Y         (pad) =
   7 H            16 Q            25 Z
   8 I            17 R            26 2
-  
+
   [ 8, 13, 16, 23, 8, '=', '=', '=' ]
   [ I, N, Q, X, I, '=', '=', '=' ]
-
-  */
+*/
 
 it('to_ascii', async () => {
-  const [{ to_ascii }] = await base32.call('to_ascii', {
-    input: 'Cat'
-  });
+  const { to_ascii } = await pg.one(
+    `SELECT base32.to_ascii($1::text) AS to_ascii`,
+    ['Cat']
+  );
   expect(to_ascii).toEqual([67, 97, 116]);
 });
 
 it('to_binary', async () => {
-  const [{ to_ascii }] = await base32.call('to_ascii', {
-    input: 'Cat'
-  });
-  const [{ to_binary }] = await base32.call(
-    'to_binary',
-    {
-      input: to_ascii
-    },
-    {
-      input: 'int[]'
-    }
+  const { to_ascii } = await pg.one(
+    `SELECT base32.to_ascii($1::text) AS to_ascii`,
+    ['Cat']
+  );
+  const { to_binary } = await pg.one(
+    `SELECT base32.to_binary($1::int[]) AS to_binary`,
+    [to_ascii]
   );
   expect(to_binary).toEqual(['01000011', '01100001', '01110100']);
 });
 
 it('to_groups', async () => {
-  const [{ to_groups }] = await base32.call(
-    'to_groups',
-    {
-      input: ['01000011', '01100001', '01110100']
-    },
-    {
-      input: 'text[]'
-    }
+  const { to_groups } = await pg.one(
+    `SELECT base32.to_groups($1::text[]) AS to_groups`,
+    [['01000011', '01100001', '01110100']]
   );
-  // [01000011, 01100001, 01110100, xxxxxxxx, xxxxxxxx]
   expect(to_groups).toEqual([
     '01000011',
     '01100001',
@@ -123,14 +97,9 @@ it('to_groups', async () => {
 });
 
 it('to_chunks', async () => {
-  const [{ to_chunks }] = await base32.call(
-    'to_chunks',
-    {
-      input: ['01000011', '01100001', '01110100', 'xxxxxxxx', 'xxxxxxxx']
-    },
-    {
-      input: 'text[]'
-    }
+  const { to_chunks } = await pg.one(
+    `SELECT base32.to_chunks($1::text[]) AS to_chunks`,
+    [['01000011', '01100001', '01110100', 'xxxxxxxx', 'xxxxxxxx']]
   );
   expect(to_chunks).toEqual([
     '01000',
@@ -145,23 +114,18 @@ it('to_chunks', async () => {
 });
 
 it('fill_chunks', async () => {
-  const [{ fill_chunks }] = await base32.call(
-    'fill_chunks',
-    {
-      input: [
-        '01000',
-        '01101',
-        '10000',
-        '10111',
-        '0100x',
-        'xxxxx',
-        'xxxxx',
-        'xxxxx'
-      ]
-    },
-    {
-      input: 'text[]'
-    }
+  const { fill_chunks } = await pg.one(
+    `SELECT base32.fill_chunks($1::text[]) AS fill_chunks`,
+    [[
+      '01000',
+      '01101',
+      '10000',
+      '10111',
+      '0100x',
+      'xxxxx',
+      'xxxxx',
+      'xxxxx'
+    ]]
   );
   expect(fill_chunks).toEqual([
     '01000',
@@ -176,48 +140,39 @@ it('fill_chunks', async () => {
 });
 
 it('to_decimal', async () => {
-  const [{ to_decimal }] = await base32.call(
-    'to_decimal',
-    {
-      input: [
-        '01000',
-        '01101',
-        '10000',
-        '10111',
-        '01000',
-        'xxxxx',
-        'xxxxx',
-        'xxxxx'
-      ]
-    },
-    {
-      input: 'text[]'
-    }
+  const { to_decimal } = await pg.one(
+    `SELECT base32.to_decimal($1::text[]) AS to_decimal`,
+    [[
+      '01000',
+      '01101',
+      '10000',
+      '10111',
+      '01000',
+      'xxxxx',
+      'xxxxx',
+      'xxxxx'
+    ]]
   );
   expect(to_decimal).toEqual(['8', '13', '16', '23', '8', '=', '=', '=']);
 });
 
 it('to_base32', async () => {
-  const [{ to_base32 }] = await base32.call(
-    'to_base32',
-    {
-      input: ['8', '13', '16', '23', '8', '=', '=', '=']
-    },
-    {
-      input: 'text[]'
-    }
+  const { to_base32 } = await pg.one(
+    `SELECT base32.to_base32($1::text[]) AS to_base32`,
+    [['8', '13', '16', '23', '8', '=', '=', '=']]
   );
   expect(to_base32).toEqual('INQXI===');
 });
 
 cases(
-  'base32',
+  'base32.encode',
   async (opts) => {
-    const [result] = await base32.call('encode', {
-      input: opts.name
-    });
-    expect(result.encode).toEqual(opts.result);
-    expect(result.encode).toMatchSnapshot();
+    const { encode } = await pg.one(
+      `SELECT base32.encode($1::text) AS encode`,
+      [opts.name]
+    );
+    expect(encode).toEqual(opts.result);
+    expect(encode).toMatchSnapshot();
   },
   [
     { name: '', result: '' },

@@ -1,34 +1,31 @@
-import { getConnections } from './utils';
+import { getConnections, PgTestClient } from 'pgsql-test';
 
-let db, dbs, teardown;
+let db: PgTestClient;
+let pg: PgTestClient;
+let teardown: () => Promise<void>;
+
 const objs = {
   tables: {}
 };
 
 beforeAll(async () => {
-  ({ db, teardown } = await getConnections());
-  dbs = db.helper('faker');
+  ({ db, pg, teardown } = await getConnections());
 });
 
 afterAll(async () => {
   try {
-    //try catch here allows us to see the sql parsing issues!
+    // try catch here allows us to see the SQL parsing issues!
     await teardown();
   } catch (e) {
     // noop
   }
 });
 
-beforeEach(async () => {
-  await db.beforeEach();
-});
-
-afterEach(async () => {
-  await db.afterEach();
-});
+beforeEach(() => pg.beforeEach());
+afterEach(() => pg.afterEach());
 
 it('gets random words', async () => {
-  const obj = {};
+  const obj: Record<string, any> = {};
   const types = [
     // 'word',
     // 'sentence',
@@ -67,127 +64,134 @@ it('gets random words', async () => {
     // 'ip',
     // 'business'
   ];
-  for (const t of types) {
-    obj[t] = await dbs.callOne(t);
+
+  for (const type of types) {
+    const { [type]: value } = await pg.one(`SELECT faker.${type}() AS ${type}`);
+    obj[type] = value;
   }
   console.log(obj);
 });
 
 it('lnglat', async () => {
-  const obj = {};
-  obj['lnglat'] = await dbs.callOne('lnglat', {});
-  obj['bbox'] = await dbs.callOne(
-    'lnglat',
-    {
-      x1: -118.561721,
-      y1: 33.59,
-      x2: -117.646374,
-      y2: 34.23302 // tighter to LA (from north towards LA)
-      // y2: 34.823302 // goes further north
-    },
-    {
-      x1: 'float',
-      y1: 'float',
-      x2: 'float',
-      y2: 'float'
-    }
+  const obj: Record<string, any> = {};
+  const { lnglat } = await pg.one(`SELECT faker.lnglat() AS lnglat`);
+  obj['lnglat'] = lnglat;
+
+  const { lnglat: bbox } = await pg.one(
+    `SELECT faker.lnglat($1, $2, $3, $4) AS lnglat`,
+    [-118.561721, 33.59, -117.646374, 34.23302]
   );
+  obj['bbox'] = bbox;
+
   console.log(obj);
   console.log(obj.bbox.y, ',', obj.bbox.x);
 });
+
 it('tags', async () => {
-  const obj = {};
-  obj['tags'] = await dbs.callOne('tags', {});
-  obj['tag with min'] = await dbs.callOne('tags', {
-    min: 5,
-    max: 10,
-    dict: 'tag'
-  });
-  obj['face'] = await dbs.callOne('tags', {
-    min: 5,
-    max: 10,
-    dict: 'face'
-  });
-  console.log(obj);
-});
-it('addresses', async () => {
-  const obj = {};
-  obj['any'] = await dbs.callOne('address', {});
-  obj['CA'] = await dbs.callOne('address', {
-    state: 'CA'
-  });
-  obj['MI'] = await dbs.callOne('address', {
-    state: 'MI'
-  });
-  obj['Los Angeles'] = await dbs.callOne('address', {
-    state: 'CA',
-    city: 'Los Angeles'
-  });
-  console.log(obj);
-});
-xit('mixed words and args', async () => {
-  const obj = {};
-  obj['english-words'] = await dbs.callOne('sentence', {
-    unit: 'word',
-    min: 7,
-    max: 20,
-    cat: ['colors']
-  });
-  obj['mixed-words'] = await dbs.callOne('sentence', {
-    unit: 'word',
-    min: 7,
-    max: 20,
-    cat: ['colors', 'adjectives', 'surname', 'animals', 'stop', 'stop', 'stop']
-  });
-  obj['sentence-words'] = await dbs.callOne('sentence', {
-    unit: 'word',
-    min: 7,
-    max: 20,
-    cat: ['lorem']
-  });
-  obj['sentence-chars'] = await dbs.callOne('sentence', {
-    unit: 'char',
-    min: 100,
-    max: 140,
-    cat: ['lorem']
-  });
-  obj['paragraph-chars'] = await dbs.callOne('paragraph', {
-    unit: 'char',
-    min: 300,
-    max: 500,
-    cat: ['lorem']
-  });
-  obj['integer-chars'] = await dbs.callOne('integer', {
-    min: 300,
-    max: 500
-  });
-  obj['xenial'] = await dbs.callOne('birthdate', {
-    min: 34,
-    max: 39
-  });
+  const obj: Record<string, any> = {};
+
+  const { tags } = await pg.one(`SELECT faker.tags() AS tags`);
+  obj['tags'] = tags;
+
+  const { tag_with_min } = await pg.one(
+    `SELECT faker.tags($1, $2, $3) AS tag_with_min`,
+    [5, 10, 'tag']
+  );
+  obj['tag with min'] = tag_with_min;
+
+  const { face } = await pg.one(
+    `SELECT faker.tags($1, $2, $3) AS face`,
+    [5, 10, 'face']
+  );
+  obj['face'] = face;
+
   console.log(obj);
 });
 
+it('addresses', async () => {
+  const obj: Record<string, any> = {};
+
+  obj['any'] = (await pg.one(`SELECT faker.address() AS value`)).value;
+  obj['CA'] = (await pg.one(`SELECT faker.address($1) AS value`, ['CA'])).value;
+  obj['MI'] = (await pg.one(`SELECT faker.address($1) AS value`, ['MI'])).value;
+  obj['Los Angeles'] = (
+    await pg.one(`SELECT faker.address($1, $2) AS value`, ['CA', 'Los Angeles'])
+  ).value;
+
+  console.log(obj);
+});
+
+// Placeholder for future word + cat-based generation tests
+xit('mixed words and args', async () => {
+  const obj: Record<string, any> = {};
+
+  obj['english-words'] = (
+    await pg.one(
+      `SELECT faker.sentence($1, $2, $3, $4) AS value`,
+      ['word', 7, 20, ['colors']]
+    )
+  ).value;
+
+  obj['mixed-words'] = (
+    await pg.one(
+      `SELECT faker.sentence($1, $2, $3, $4) AS value`,
+      ['word', 7, 20, ['colors', 'adjectives', 'surname', 'animals', 'stop']]
+    )
+  ).value;
+
+  obj['sentence-words'] = (
+    await pg.one(
+      `SELECT faker.sentence($1, $2, $3, $4) AS value`,
+      ['word', 7, 20, ['lorem']]
+    )
+  ).value;
+
+  obj['sentence-chars'] = (
+    await pg.one(
+      `SELECT faker.sentence($1, $2, $3, $4) AS value`,
+      ['char', 100, 140, ['lorem']]
+    )
+  ).value;
+
+  obj['paragraph-chars'] = (
+    await pg.one(
+      `SELECT faker.paragraph($1, $2, $3, $4) AS value`,
+      ['char', 300, 500, ['lorem']]
+    )
+  ).value;
+
+  obj['integer-chars'] = (
+    await pg.one(`SELECT faker.integer($1, $2) AS value`, [300, 500])
+  ).value;
+
+  obj['xenial'] = (
+    await pg.one(`SELECT faker.birthdate($1, $2) AS value`, [34, 39])
+  ).value;
+
+  console.log(obj);
+});
+
+// Placeholder for business tests
 // it('businesses', async () => {
 //   for (let i = 0; i < 20; i++) {
-//     const biz = await dbs.callOne('business');
-//     console.log(biz);
+//     const { business } = await pg.one(`SELECT faker.business() AS business`);
+//     console.log(business);
 //   }
 // });
 
+// Placeholder for city/zip tests
 // it('cities', async () => {
 //   for (let i = 0; i < 20; i++) {
-//     const city = await dbs.callOne('city');
+//     const { city } = await pg.one(`SELECT faker.city() AS city`);
 //     console.log(city);
-//     const city2 = await dbs.callOne('city', {
-//       state: 'MI'
-//     });
+
+//     const { city: city2 } = await pg.one(`SELECT faker.city($1) AS city`, ['MI']);
 //     console.log(city2);
-//     const zip = await dbs.callOne('zip');
+
+//     const { zip } = await pg.one(`SELECT faker.zip() AS zip`);
 //     console.log(zip);
-//     const zip2 = await dbs.callOne('zip', {
-//       city: 'Los Angeles'
-//     });
+
+//     const { zip: zip2 } = await pg.one(`SELECT faker.zip($1) AS zip`, ['Los Angeles']);
 //     console.log(zip2);
 //   }
 // });

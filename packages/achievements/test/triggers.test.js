@@ -1,105 +1,11 @@
-import { getConnections } from './utils';
-import { snap } from './utils/snaps';
-let db, teardown;
-const objs = {
-  tables: {}
-};
+import { getConnections, PgTestClient } from 'pgsql-test';
+import { snapshot } from 'graphile-test';
+
+let db: PgTestClient;
+let pg: PgTestClient;
+let teardown: () => Promise<void>;
+
 const user_id = 'b9d22af1-62c7-43a5-b8c4-50630bbd4962';
-const status = {};
-
-const repeat = (str, n) => Array.from({ length: n }).fill([str]).flat();
-
-beforeAll(async () => {
-  ({ db, teardown } = await getConnections());
-  // await db.begin();
-  // await db.savepoint();
-
-  status.public = db.helper('status_public');
-  status.private = db.helper('status_private');
-
-  await db.any(`CREATE TABLE status_public.mytable (
-    id serial,
-    name text,
-    toggle text,
-    is_approved boolean,
-    is_verified boolean default false
-  );`);
-
-  await db.any(`
-    CREATE TRIGGER mytable_tg1 
-    BEFORE INSERT ON status_public.mytable 
-    FOR EACH ROW
-    EXECUTE PROCEDURE status_private.tg_achievement('name', 'tg_achievement');
-  `);
-  await db.any(`
-    CREATE TRIGGER mytable_tg2
-    BEFORE UPDATE ON status_public.mytable 
-    FOR EACH ROW
-    WHEN (NEW.name IS DISTINCT FROM OLD.name)
-    EXECUTE PROCEDURE status_private.tg_achievement('name', 'tg_achievement');
-  `);
-
-  await db.any(`
-      CREATE TRIGGER mytable_tg3
-      BEFORE INSERT ON status_public.mytable
-      FOR EACH ROW
-      EXECUTE PROCEDURE status_private.tg_achievement_toggle('toggle', 'tg_achievement_toggle');
-    `);
-  await db.any(`
-      CREATE TRIGGER mytable_tg4
-      BEFORE UPDATE ON status_public.mytable
-      FOR EACH ROW
-      WHEN (NEW.toggle IS DISTINCT FROM OLD.toggle)
-      EXECUTE PROCEDURE status_private.tg_achievement_toggle('toggle', 'tg_achievement_toggle');
-    `);
-
-  await db.any(`
-      CREATE TRIGGER mytable_tg5
-      BEFORE INSERT ON status_public.mytable
-      FOR EACH ROW
-      EXECUTE PROCEDURE status_private.tg_achievement_boolean('is_approved', 'tg_achievement_boolean');
-    `);
-  await db.any(`
-      CREATE TRIGGER mytable_tg6
-      BEFORE UPDATE ON status_public.mytable
-      FOR EACH ROW
-      WHEN (NEW.is_approved IS DISTINCT FROM OLD.is_approved)
-      EXECUTE PROCEDURE status_private.tg_achievement_boolean('is_approved', 'tg_achievement_boolean');
-    `);
-
-  await db.any(`
-      CREATE TRIGGER mytable_tg7
-      BEFORE INSERT ON status_public.mytable
-      FOR EACH ROW
-      EXECUTE PROCEDURE status_private.tg_achievement_toggle_boolean('is_verified', 'tg_achievement_toggle_boolean');
-    `);
-  await db.any(`
-      CREATE TRIGGER mytable_tg8
-      BEFORE UPDATE ON status_public.mytable
-      FOR EACH ROW
-      WHEN (NEW.is_verified IS DISTINCT FROM OLD.is_verified)
-      EXECUTE PROCEDURE status_private.tg_achievement_toggle_boolean('is_verified', 'tg_achievement_toggle_boolean');
-    `);
-
-  db.setContext({
-    'jwt.claims.user_id': user_id
-  });
-});
-
-afterAll(async () => {
-  try {
-    // try catch here allows us to see the sql parsing issues!
-    // await db.rollback();
-    // await db.commit();
-    await teardown();
-  } catch (e) {
-    // noop
-  }
-});
-
-afterEach(async () => {
-  await db.afterEach();
-});
 
 const levels = ['newbie', 'advanced'];
 
@@ -115,95 +21,154 @@ const advanced = [
   ['complete_action', 15]
 ];
 
-beforeEach(async () => {
-  await db.beforeEach();
-  //
-  for (const name of levels) {
-    await status.public.insertOne('levels', {
-      name
-    });
-  }
-  //
-  for (const [name, required_count = 1] of newbie) {
-    await status.public.insertOne('level_requirements', {
-      name,
-      level: 'newbie',
-      required_count
-    });
-  }
-  for (const [name, required_count = 1] of advanced) {
-    await status.public.insertOne('level_requirements', {
-      name,
-      level: 'advanced',
-      required_count
-    });
+beforeAll(async () => {
+  ({ db, pg, teardown } = await getConnections());
+
+  await pg.any(`CREATE TABLE status_public.mytable (
+    id serial,
+    name text,
+    toggle text,
+    is_approved boolean,
+    is_verified boolean default false
+  );`);
+
+  await pg.any(`CREATE TRIGGER mytable_tg1 
+    BEFORE INSERT ON status_public.mytable 
+    FOR EACH ROW
+    EXECUTE FUNCTION status_private.tg_achievement('name', 'tg_achievement');`);
+
+  await pg.any(`CREATE TRIGGER mytable_tg2
+    BEFORE UPDATE ON status_public.mytable 
+    FOR EACH ROW
+    WHEN (NEW.name IS DISTINCT FROM OLD.name)
+    EXECUTE FUNCTION status_private.tg_achievement('name', 'tg_achievement');`);
+
+  await pg.any(`CREATE TRIGGER mytable_tg3
+    BEFORE INSERT ON status_public.mytable
+    FOR EACH ROW
+    EXECUTE FUNCTION status_private.tg_achievement_toggle('toggle', 'tg_achievement_toggle');`);
+
+  await pg.any(`CREATE TRIGGER mytable_tg4
+    BEFORE UPDATE ON status_public.mytable
+    FOR EACH ROW
+    WHEN (NEW.toggle IS DISTINCT FROM OLD.toggle)
+    EXECUTE FUNCTION status_private.tg_achievement_toggle('toggle', 'tg_achievement_toggle');`);
+
+  await pg.any(`CREATE TRIGGER mytable_tg5
+    BEFORE INSERT ON status_public.mytable
+    FOR EACH ROW
+    EXECUTE FUNCTION status_private.tg_achievement_boolean('is_approved', 'tg_achievement_boolean');`);
+
+  await pg.any(`CREATE TRIGGER mytable_tg6
+    BEFORE UPDATE ON status_public.mytable
+    FOR EACH ROW
+    WHEN (NEW.is_approved IS DISTINCT FROM OLD.is_approved)
+    EXECUTE FUNCTION status_private.tg_achievement_boolean('is_approved', 'tg_achievement_boolean');`);
+
+  await pg.any(`CREATE TRIGGER mytable_tg7
+    BEFORE INSERT ON status_public.mytable
+    FOR EACH ROW
+    EXECUTE FUNCTION status_private.tg_achievement_toggle_boolean('is_verified', 'tg_achievement_toggle_boolean');`);
+
+  await pg.any(`CREATE TRIGGER mytable_tg8
+    BEFORE UPDATE ON status_public.mytable
+    FOR EACH ROW
+    WHEN (NEW.is_verified IS DISTINCT FROM OLD.is_verified)
+    EXECUTE FUNCTION status_private.tg_achievement_toggle_boolean('is_verified', 'tg_achievement_toggle_boolean');`);
+
+  await pg.setContext({
+    'jwt.claims.user_id': user_id
+  });
+});
+
+afterAll(async () => {
+  try {
+    await teardown();
+  } catch (e) {
+    // noop
   }
 });
 
+beforeEach(async () => {
+  await pg.beforeEach();
+
+  // Insert levels
+  for (const name of levels) {
+    await pg.any(
+      `INSERT INTO status_public.levels (name) VALUES ($1) ON CONFLICT DO NOTHING`,
+      [name]
+    );
+  }
+
+  // Insert level requirements
+  for (const [name, required_count = 1] of newbie) {
+    await pg.any(
+      `INSERT INTO status_public.level_requirements (name, level, required_count)
+       VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+      [name, 'newbie', required_count]
+    );
+  }
+  for (const [name, required_count = 1] of advanced) {
+    await pg.any(
+      `INSERT INTO status_public.level_requirements (name, level, required_count)
+       VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+      [name, 'advanced', required_count]
+    );
+  }
+});
+
+afterEach(async () => {
+  await pg.afterEach();
+});
+
 it('newbie', async () => {
-  const beforeInsert = await status.public.select('user_achievements', ['*']);
-  snap({ beforeInsert });
-
-  await status.public.insertOne('mytable', {
-    name
-  });
-
-  const afterFirstInsert = await status.public.select('user_achievements', [
-    '*'
-  ]);
-  snap({ afterFirstInsert });
-
-  await db.any(`
-  UPDATE status_public.mytable
-    SET toggle='yo';
-    `);
-
-  const afterUpdateToggleToValue = await status.public.select(
-    'user_achievements',
-    ['*']
+  const beforeInsert = await pg.any(
+    `SELECT * FROM status_public.user_achievements ORDER BY name`
   );
-  snap({ afterUpdateToggleToValue });
+  expect(snapshot({ beforeInsert })).toMatchSnapshot();
 
-  await db.any(`
-  UPDATE status_public.mytable
-    SET toggle=NULL;
-    `);
-
-  const afterUpdateToggleToNull = await status.public.select(
-    'user_achievements',
-    ['*']
+  await pg.any(
+    `INSERT INTO status_public.mytable (name) VALUES ($1)`,
+    ['upload_profile_image']
   );
-  snap({ afterUpdateToggleToNull });
 
-  await db.any(`
-  UPDATE status_public.mytable
-    SET is_verified=TRUE;
-    `);
-
-  const afterIsVerifiedIsTrue = await status.public.select(
-    'user_achievements',
-    ['*']
+  const afterFirstInsert = await pg.any(
+    `SELECT * FROM status_public.user_achievements ORDER BY name`
   );
-  snap({ afterIsVerifiedIsTrue });
+  expect(snapshot({ afterFirstInsert })).toMatchSnapshot();
 
-  await db.any(`
-  UPDATE status_public.mytable
-    SET is_verified=FALSE;
-    `);
+  await pg.any(`UPDATE status_public.mytable SET toggle = 'yo'`);
 
-  const afterIsVerifiedIsFalse = await status.public.select(
-    'user_achievements',
-    ['*']
+  const afterUpdateToggleToValue = await pg.any(
+    `SELECT * FROM status_public.user_achievements ORDER BY name`
   );
-  snap({ afterIsVerifiedIsFalse });
+  expect(snapshot({ afterUpdateToggleToValue })).toMatchSnapshot();
 
-  await db.any(`
-  UPDATE status_public.mytable
-    SET is_approved=TRUE;
-    `);
+  await pg.any(`UPDATE status_public.mytable SET toggle = NULL`);
 
-  const afterIsApprovedTrue = await status.public.select('user_achievements', [
-    '*'
-  ]);
-  snap({ afterIsApprovedTrue });
+  const afterUpdateToggleToNull = await pg.any(
+    `SELECT * FROM status_public.user_achievements ORDER BY name`
+  );
+  expect(snapshot({ afterUpdateToggleToNull })).toMatchSnapshot();
+
+  await pg.any(`UPDATE status_public.mytable SET is_verified = TRUE`);
+
+  const afterIsVerifiedIsTrue = await pg.any(
+    `SELECT * FROM status_public.user_achievements ORDER BY name`
+  );
+  expect(snapshot({ afterIsVerifiedIsTrue })).toMatchSnapshot();
+
+  await pg.any(`UPDATE status_public.mytable SET is_verified = FALSE`);
+
+  const afterIsVerifiedIsFalse = await pg.any(
+    `SELECT * FROM status_public.user_achievements ORDER BY name`
+  );
+  expect(snapshot({ afterIsVerifiedIsFalse })).toMatchSnapshot();
+
+  await pg.any(`UPDATE status_public.mytable SET is_approved = TRUE`);
+
+  const afterIsApprovedTrue = await pg.any(
+    `SELECT * FROM status_public.user_achievements ORDER BY name`
+  );
+  expect(snapshot({ afterIsApprovedTrue })).toMatchSnapshot();
 });
