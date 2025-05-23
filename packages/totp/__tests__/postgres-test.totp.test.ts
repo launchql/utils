@@ -28,26 +28,27 @@ afterEach(async () => {
 
 describe('TOTP', () => {
   it('should generate a TOTP secret', async () => {
-    const [result] = await db.query(`
+    const result = await db.query(`
       SELECT totp.generate_secret() as secret;
     `);
-    expect(result.secret).toBeTruthy();
+    expect(result.rows[0].secret).toBeTruthy();
   });
 
   it('should verify a TOTP token', async () => {
-    const [{ secret }] = await db.query(`
+    const result = await db.query(`
       SELECT totp.generate_secret() as secret;
     `);
+    const secret = result.rows[0].secret;
 
     const token = speakeasy.totp({
       secret: secret,
       encoding: 'base32'
     });
 
-    const [result] = await db.query(`
+    const verifyResult = await db.query(`
       SELECT totp.verify_token($1, $2) as verified;
     `, [secret, token]);
     
-    expect(result.verified).toBe(true);
+    expect(verifyResult.rows[0].verified).toBe(true);
   });
 });

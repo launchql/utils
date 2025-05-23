@@ -27,11 +27,11 @@ afterEach(async () => {
 
 describe('defaults', () => {
   it('should have defaults schema', async () => {
-    const [result] = await db.query(`
+    const result = await db.query(`
       SELECT schema_name
       FROM information_schema.schemata
       WHERE schema_name = 'defaults';
     `);
-    expect(result).toBeTruthy();
+    expect(result.rows[0]).toBeTruthy();
   });
 });

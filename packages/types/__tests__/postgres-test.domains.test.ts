@@ -95,6 +95,14 @@ afterAll(async () => {
   }
 });
 
+beforeEach(async () => {
+  await db.beforeEach();
+});
+
+afterEach(async () => {
+  await db.afterEach();
+});
+
 describe('types', () => {
   it('valid attachment and image', async () => {
     for (let i = 0; i < validAttachments.length; i++) {

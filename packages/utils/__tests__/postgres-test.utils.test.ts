@@ -26,31 +26,31 @@ afterEach(async () => {
 });
 
 it('more', async () => {
-  const [result] = await db.query(`
+  const result = await db.query(`
     SELECT utils.mask_pad('101', 20) as result;
   `);
-  expect(result).toBeTruthy();
+  expect(result.rows[0].result).toBeTruthy();
 });
 
 it('less', async () => {
-  const [result] = await db.query(`
+  const result = await db.query(`
     SELECT utils.mask_pad('101', 2) as result;
   `);
-  expect(result).toBeTruthy();
+  expect(result.rows[0].result).toBeTruthy();
 });
 
 describe('bitmask', () => {
   it('more', async () => {
-    const [result] = await db.query(`
+    const result = await db.query(`
       SELECT utils.bitmask_pad('101', 20) as result;
     `);
-    expect(result).toBeTruthy();
+    expect(result.rows[0].result).toBeTruthy();
   });
 
   it('less', async () => {
-    const [result] = await db.query(`
+    const result = await db.query(`
       SELECT utils.bitmask_pad('101', 2) as result;
     `);
-    expect(result).toBeTruthy();
+    expect(result.rows[0].result).toBeTruthy();
   });
 });
