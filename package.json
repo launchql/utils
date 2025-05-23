@@ -31,5 +31,9 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "resolutions": {
+    "graphql-request": "^4.3.0",
+    "graphql": "15.5.2"
+  }
 }
