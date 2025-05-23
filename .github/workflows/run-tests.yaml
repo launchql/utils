@@ -7,6 +7,11 @@ jobs:
   container-job:
     runs-on: ubuntu-latest
     container: pyramation/node-sqitch:20.12.0
+    env:
+      PGHOST: pg_db
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: password
 
     services:
       pg_db:
@@ -55,11 +60,6 @@ jobs:
       - name: seed app_user
         run: |
           psql -f ./bootstrap-roles.sql postgres
-        env:
-          PGHOST: pg_db
-          PGPORT: 5432
-          PGUSER: postgres
-          PGPASSWORD: password
 
       - name: utils
         run: cd ./packages/utils && yarn test
