@@ -43,6 +43,11 @@ afterEach(() => pg.afterEach());
 
   convert to decimal value
 
+  [01000, 01101, 10000, 10111, 01000, xxxxx, xxxxx, xxxxx]
+  [0b01000, 0b01101, 0b10000, 0b10111, 0b01000, xxxxx, xxxxx, xxxxx]
+  
+  convert to decimal value
+
   [ 8, 13, 16, 23, 8, '=', '=', '=' ]
 
   Table 3: The Base 32 Alphabet
