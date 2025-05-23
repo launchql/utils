@@ -1,0 +1,56 @@
+name: LaunchQL Utils tests
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  container-job:
+    runs-on: ubuntu-latest
+    container: pyramation/node-sqitch:20.12.0
+
+    env:
+      PGHOST: pg_db
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: password
+
+    services:
+      pg_db:
+        image: pyramation/postgis
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+ 
+    steps:
+      - name: Configure Git (for tests)
+        run: |
+          git config --global user.name "CI Test User"
+          git config --global user.email "ci@example.com"
+
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: deps
+        run: yarn
+
+      - name: build
+        run: yarn build
+
+      - name: seed app_user
+        run: |
+          psql -f ./bootstrap-roles.sql postgres
+        env:
+          PGHOST: pg_db
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: password
+
+      - name: utils
+        run: cd ./packages/utils && yarn test

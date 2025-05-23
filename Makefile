@@ -11,4 +11,16 @@ ssh:
 install:
 	docker exec utils-postgres /sql-bin/install.sh
 
+clean:
+	lerna run clean
+
+build:
+	lerna run build --stream
+
+lint:
+	lerna run lint --parallel
+
+test:
+	lerna run test --stream
+
   
