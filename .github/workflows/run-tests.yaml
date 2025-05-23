@@ -40,9 +40,8 @@ jobs:
 
       - name: deps
         run: |
-          apt-get update && apt-get install -y python2
-          ln -sf /usr/bin/python2 /usr/bin/python
-          yarn --ignore-engines
+          export PYTHON=/usr/bin/python3
+          yarn --ignore-engines --ignore-optional
 
       - name: build
         run: yarn build
