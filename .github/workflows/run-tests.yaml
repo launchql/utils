@@ -34,6 +34,13 @@ jobs:
           git config --global user.name "CI Test User"
           git config --global user.email "ci@example.com"
 
+      - name: Install Python 2 for node-gyp
+        run: |
+          apt-get update
+          apt-get install -y python2
+          ln -sf /usr/bin/python2 /usr/bin/python
+          python --version
+
       - name: checkout
         uses: actions/checkout@v4
 
