@@ -40,8 +40,7 @@ jobs:
 
       - name: deps
         run: |
-          export PYTHON=/usr/bin/python3
-          yarn --ignore-engines --ignore-optional
+          yarn --ignore-engines --ignore-scripts
 
       - name: build
         run: yarn build
