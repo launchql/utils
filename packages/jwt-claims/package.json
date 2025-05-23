@@ -1,37 +1,56 @@
 {
   "name": "@launchql/ext-jwt-claims",
   "version": "0.4.6",
-  "description": "ext-jwt-claims",
   "author": "Web, Inc. <pyramation@gmail.com>",
+  "description": "ext-jwt-claims",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/launchql/utils",
+  "license": "MIT",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "directory": "dist"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/launchql/utils"
+  },
+  "bugs": {
+    "url": "https://github.com/launchql/utils/issues"
+  },
+  "keywords": [
+    "postgres",
+    "postgresql",
+    "jwt",
+    "claims",
+    "launchql"
+  ],
   "scripts": {
-    "test": "FAST_TEST=1 launchql-templatedb && jest",
-    "test:watch": "FAST_TEST=1 jest --watch",
-    "prepare": "lql package"
+    "copy": "copyfiles -f ../../../LICENSE README.md package.json dist",
+    "clean": "rimraf dist/**",
+    "prepare": "npm run build",
+    "build": "npm run clean; tsc; tsc -p tsconfig.esm.json; npm run copy",
+    "build:dev": "npm run clean; tsc --declarationMap; tsc -p tsconfig.esm.json; npm run copy",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@babel/cli": "7.10.4",
-    "@babel/core": "7.10.4",
-    "@babel/plugin-proposal-class-properties": "7.10.4",
-    "@babel/plugin-proposal-export-default-from": "7.10.4",
-    "@babel/plugin-proposal-object-rest-spread": "7.10.4",
-    "@babel/plugin-transform-runtime": "7.10.4",
-    "@babel/preset-env": "7.10.4",
-    "@babel/runtime": "^7.4.2",
-    "@launchql/db-testing": "latest",
-    "babel-eslint": "10.1.0",
-    "babel-jest": "26.1.0",
-    "eslint": "^7.3.1",
-    "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-prettier": "^3.1.2",
-    "jest": "26.1.0",
-    "prettier": "2.0.5",
-    "regenerator-runtime": "^0.13.2"
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.12.7",
+    "@types/pg": "^8.15.2",
+    "copyfiles": "^2.4.1",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "jest": "^29.6.2",
+    "prettier": "^3.0.2",
+    "rimraf": "4.4.1",
+    "ts-jest": "^29.1.1"
   },
   "dependencies": {
-    "@launchql/ext-types": "^0.4.6"
+    "@launchql/ext-types": "^0.4.6",
+    "pgsql-test": "^2.1.14"
   },
   "gitHead": "bc0f36b82f3e103a79c3e75adae8fd0434f1bdb1"
 }
