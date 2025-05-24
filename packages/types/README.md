@@ -1,4 +1,4 @@
-# @launchql/ext-jobs-queue
+# @launchql/ext-types
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/launchql/launchql/refs/heads/main/assets/outline-logo.svg" />
@@ -9,35 +9,49 @@
     <img height="20" src="https://github.com/launchql/utils/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/launchql/utils/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@launchql/ext-jobs-queue"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fjobs-simple%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@launchql/ext-types"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Ftypes%2Fpackage.json"/></a>
 </p>
 
-A simplified asynchronous job queue schema for ACID compliant job creation through triggers/functions/etc. This PostgreSQL extension provides a lightweight job queue system for background processing.
+PostgreSQL extension providing custom domain types with built-in validation. This extension includes a collection of commonly needed data types with validation constraints, making it easy to enforce data integrity directly at the database level.
 
 ## Usage
 
 ```sql
--- Create a job
-SELECT jobs_queue.add_job('my_job_type', json_build_object('key', 'value'));
-
--- Process jobs
-SELECT jobs_queue.process_jobs();
-
--- Create a job with specific settings
-SELECT jobs_queue.add_job(
-  job_type => 'send_email',
-  payload => json_build_object('to', 'user@example.com', 'subject', 'Hello'),
-  max_attempts => 3,
-  run_at => now() + interval '1 minute'
+-- Create a table using the custom domain types
+CREATE TABLE users (
+  id serial PRIMARY KEY,
+  email email NOT NULL,
+  website url,
+  profile_image image,
+  origin origin
 );
 
--- Query job status
-SELECT * FROM jobs_queue.jobs WHERE job_type = 'send_email';
+-- Insert data with automatic validation
+INSERT INTO users (email, website, profile_image, origin) 
+VALUES (
+  'user@example.com',
+  'https://example.com',
+  '{"url": "https://example.com/profile.jpg", "mime": "image/jpeg"}',
+  'https://example.com'
+);
+
+-- Invalid data will be rejected automatically
+INSERT INTO users (email) VALUES ('not-an-email'); -- Fails validation
 ```
 
-## Credits
+## Available Types
 
-Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46ee8da98a1efac218
+| Domain Type | Description | Validation |
+|-------------|-------------|------------|
+| `email` | Email addresses | Validates format using regex pattern |
+| `url` | URLs | Ensures valid HTTP/HTTPS URL format |
+| `origin` | Website origins | Extracts and validates domain portion of URLs |
+| `hostname` | Server hostnames | Validates hostname format |
+| `attachment` | File attachments | Validates URL format for attachments |
+| `image` | Image references | Validates JSON with URL and MIME type |
+| `upload` | File uploads | Validates JSON with URL and MIME type |
+| `single_select` | Single selection | Validates JSON with value property |
+| `multiple_select` | Multiple selections | Validates JSON with value property |
 
 ## Related LaunchQL Tooling
 
@@ -83,5 +97,4 @@ Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
-
 

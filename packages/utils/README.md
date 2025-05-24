@@ -1,4 +1,4 @@
-# @launchql/ext-jobs-queue
+# @launchql/utils
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/launchql/launchql/refs/heads/main/assets/outline-logo.svg" />
@@ -9,35 +9,100 @@
     <img height="20" src="https://github.com/launchql/utils/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/launchql/utils/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@launchql/ext-jobs-queue"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fjobs-simple%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@launchql/utils"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Futils%2Fpackage.json"/></a>
 </p>
 
-A simplified asynchronous job queue schema for ACID compliant job creation through triggers/functions/etc. This PostgreSQL extension provides a lightweight job queue system for background processing.
+A lightweight PostgreSQL utility extension providing helper functions for bitmask padding and custom trigger-based exceptions. Useful for schema consistency and low-level logic utilities in advanced database projects.
+
+## Features
+
+* 🏗️ **Schema creation**: Automatically sets up a `utils` schema with sensible defaults.
+* 🧮 **Bitmask manipulation**:
+
+  * `utils.mask_pad`: Pads or trims a text-based bit string.
+  * `utils.bitmask_pad`: Same logic, but for PostgreSQL `VARBIT` types.
+* ⚠️ **Trigger error handler**:
+
+  * `utils.throw`: A customizable trigger function for raising exceptions, useful for debugging or enforcing logic constraints.
+
+## Installation
+
+To install and deploy this utility with LaunchQL CLI:
+
+```bash
+npm install -g @launchql/cli
+
+cd /path/to/launchql/utils/totp
+
+lql deploy \
+  --recursive \
+  --fast \
+  --createdb \
+  --yes \
+  --database mydb \
+  --project launchql-totp
+```
 
 ## Usage
 
+### `utils.mask_pad(bitstr text, bitlen int, pad text DEFAULT '0') → text`
+
+**Purpose**:
+Pads a binary string (as text) on the left with a specified character (default `'0'`) to a given length, or truncates it from the left if it's longer than `bitlen`.
+
+**Example**:
+
 ```sql
--- Create a job
-SELECT jobs_queue.add_job('my_job_type', json_build_object('key', 'value'));
-
--- Process jobs
-SELECT jobs_queue.process_jobs();
-
--- Create a job with specific settings
-SELECT jobs_queue.add_job(
-  job_type => 'send_email',
-  payload => json_build_object('to', 'user@example.com', 'subject', 'Hello'),
-  max_attempts => 3,
-  run_at => now() + interval '1 minute'
-);
-
--- Query job status
-SELECT * FROM jobs_queue.jobs WHERE job_type = 'send_email';
+SELECT utils.mask_pad('101', 6);         -- Returns '000101'
+SELECT utils.mask_pad('11110000', 4);    -- Returns '0000'
+SELECT utils.mask_pad('1', 3, 'x');      -- Returns 'xx1'
 ```
 
-## Credits
+---
 
-Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46ee8da98a1efac218
+### `utils.bitmask_pad(bitstr VARBIT, bitlen int, pad text DEFAULT '0') → VARBIT`
+
+**Purpose**:
+Same as `mask_pad`, but for native PostgreSQL `VARBIT` (variable-length bit string) values. Outputs a `VARBIT` result.
+
+**Example**:
+
+```sql
+SELECT utils.bitmask_pad(B'101', 6);          -- Returns B'000101'
+SELECT utils.bitmask_pad(B'11110000', 4);     -- Returns B'0000'
+SELECT utils.bitmask_pad(B'1', 3, '1');       -- Returns B'111'
+```
+
+---
+
+### `utils.throw() → TRIGGER`
+
+**Purpose**:
+Custom trigger function that raises an exception when triggered. Useful for enforcing invariants, debugging, or intentional operation blocking.
+
+**Trigger Arguments**:
+
+* If **1 argument**: it becomes the error message.
+* If **2 arguments**: both are included in the error.
+* If **0 or more than 2**: default fallback message.
+
+**Example**:
+
+```sql
+-- Example table
+CREATE TABLE protected_actions (
+  id serial PRIMARY KEY,
+  action text
+);
+
+-- Add trigger to block inserts with custom message
+CREATE TRIGGER block_insert
+BEFORE INSERT ON protected_actions
+FOR EACH ROW EXECUTE FUNCTION utils.throw('Insert operation blocked');
+
+-- Attempting to insert will now raise an exception:
+-- ERROR:  Insert operation blocked (protected_actions)
+```
 
 ## Related LaunchQL Tooling
 
@@ -83,5 +148,4 @@ Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
-
 

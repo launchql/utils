@@ -1,4 +1,4 @@
-# @launchql/ext-jobs-queue
+# @launchql/ext-stamps
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/launchql/launchql/refs/heads/main/assets/outline-logo.svg" />
@@ -9,35 +9,48 @@
     <img height="20" src="https://github.com/launchql/utils/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/launchql/utils/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@launchql/ext-jobs-queue"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fjobs-simple%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@launchql/ext-stamps"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fstamps%2Fpackage.json"/></a>
 </p>
 
-A simplified asynchronous job queue schema for ACID compliant job creation through triggers/functions/etc. This PostgreSQL extension provides a lightweight job queue system for background processing.
+PostgreSQL extension providing trigger functions for automatically adding timestamps and user tracking to database tables. This extension simplifies the implementation of audit trails by automatically recording creation and update timestamps, as well as the users who performed these actions.
 
 ## Usage
 
 ```sql
--- Create a job
-SELECT jobs_queue.add_job('my_job_type', json_build_object('key', 'value'));
-
--- Process jobs
-SELECT jobs_queue.process_jobs();
-
--- Create a job with specific settings
-SELECT jobs_queue.add_job(
-  job_type => 'send_email',
-  payload => json_build_object('to', 'user@example.com', 'subject', 'Hello'),
-  max_attempts => 3,
-  run_at => now() + interval '1 minute'
+-- Create a table with timestamp and user tracking columns
+CREATE TABLE my_schema.my_table (
+  id serial PRIMARY KEY,
+  name text,
+  created_at timestamptz,
+  updated_at timestamptz,
+  created_by uuid,
+  updated_by uuid
 );
 
--- Query job status
-SELECT * FROM jobs_queue.jobs WHERE job_type = 'send_email';
+-- Add timestamp trigger to automatically set created_at and updated_at
+CREATE TRIGGER set_timestamps
+BEFORE INSERT OR UPDATE ON my_schema.my_table
+FOR EACH ROW EXECUTE PROCEDURE stamps.timestamps();
+
+-- Add user tracking trigger to automatically set created_by and updated_by
+CREATE TRIGGER set_peoplestamps
+BEFORE INSERT OR UPDATE ON my_schema.my_table
+FOR EACH ROW EXECUTE PROCEDURE stamps.peoplestamps();
+
+-- Now when you insert or update records, the stamps are automatically set
+INSERT INTO my_schema.my_table (name) VALUES ('Example');
+-- created_at, updated_at, created_by, and updated_by are automatically populated
+
+UPDATE my_schema.my_table SET name = 'Updated Example' WHERE id = 1;
+-- updated_at and updated_by are automatically updated while created_at and created_by remain unchanged
 ```
 
-## Credits
+## Features
 
-Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46ee8da98a1efac218
+- Automatic timestamp management with `stamps.timestamps()` trigger function
+- Automatic user tracking with `stamps.peoplestamps()` trigger function
+- Integration with JWT claims for current user identification
+- Proper permission grants for authenticated and anonymous roles
 
 ## Related LaunchQL Tooling
 
@@ -83,5 +96,4 @@ Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
-
 

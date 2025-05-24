@@ -1,4 +1,4 @@
-# @launchql/ext-jobs-queue
+# @launchql/geo-types
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/launchql/launchql/refs/heads/main/assets/outline-logo.svg" />
@@ -9,35 +9,36 @@
     <img height="20" src="https://github.com/launchql/utils/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/launchql/utils/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@launchql/ext-jobs-queue"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fjobs-simple%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@launchql/geo-types"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fgeotypes%2Fpackage.json"/></a>
 </p>
 
-A simplified asynchronous job queue schema for ACID compliant job creation through triggers/functions/etc. This PostgreSQL extension provides a lightweight job queue system for background processing.
+PostgreSQL extension providing domain types for geospatial data using PostGIS.
 
 ## Usage
 
 ```sql
--- Create a job
-SELECT jobs_queue.add_job('my_job_type', json_build_object('key', 'value'));
-
--- Process jobs
-SELECT jobs_queue.process_jobs();
-
--- Create a job with specific settings
-SELECT jobs_queue.add_job(
-  job_type => 'send_email',
-  payload => json_build_object('to', 'user@example.com', 'subject', 'Hello'),
-  max_attempts => 3,
-  run_at => now() + interval '1 minute'
+-- Create a table with geolocation (point) data
+CREATE TABLE locations (
+  id serial PRIMARY KEY,
+  name text NOT NULL,
+  position geolocation NOT NULL
 );
 
--- Query job status
-SELECT * FROM jobs_queue.jobs WHERE job_type = 'send_email';
+-- Insert a point using WGS84 coordinates (SRID 4326)
+INSERT INTO locations (name, position)
+VALUES ('Central Park', ST_SetSRID(ST_MakePoint(-73.965355, 40.782865), 4326));
+
+-- Create a table with polygon data
+CREATE TABLE regions (
+  id serial PRIMARY KEY,
+  name text NOT NULL,
+  boundary geopolygon NOT NULL
+);
+
+-- The extension provides two domain types:
+-- 1. geolocation - geometry(point, 4326)
+-- 2. geopolygon - geometry(polygon, 4326)
 ```
-
-## Credits
-
-Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46ee8da98a1efac218
 
 ## Related LaunchQL Tooling
 
@@ -83,5 +84,4 @@ Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
-
 

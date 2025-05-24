@@ -1,4 +1,4 @@
-# @launchql/ext-jobs-queue
+# @launchql/ext-verify
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/launchql/launchql/refs/heads/main/assets/outline-logo.svg" />
@@ -9,35 +9,40 @@
     <img height="20" src="https://github.com/launchql/utils/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/launchql/utils/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@launchql/ext-jobs-queue"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fjobs-simple%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@launchql/ext-verify"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fverify%2Fpackage.json"/></a>
 </p>
 
-A simplified asynchronous job queue schema for ACID compliant job creation through triggers/functions/etc. This PostgreSQL extension provides a lightweight job queue system for background processing.
+PostgreSQL extension providing utility functions for database object verification and introspection. This extension includes functions for parsing schema-qualified identifiers, listing database objects, and verifying database relationships and permissions.
 
 ## Usage
 
 ```sql
--- Create a job
-SELECT jobs_queue.add_job('my_job_type', json_build_object('key', 'value'));
+-- Extract entity name from a schema-qualified identifier
+SELECT get_entity_from_str('public.users');
+-- Result: 'users'
 
--- Process jobs
-SELECT jobs_queue.process_jobs();
+-- Extract schema name from a schema-qualified identifier
+SELECT get_schema_from_str('public.users');
+-- Result: 'public'
 
--- Create a job with specific settings
-SELECT jobs_queue.add_job(
-  job_type => 'send_email',
-  payload => json_build_object('to', 'user@example.com', 'subject', 'Hello'),
-  max_attempts => 3,
-  run_at => now() + interval '1 minute'
-);
+-- If no schema is specified, 'public' is assumed
+SELECT get_schema_from_str('users');
+-- Result: 'public'
 
--- Query job status
-SELECT * FROM jobs_queue.jobs WHERE job_type = 'send_email';
+-- List indexes for a specific table
+SELECT * FROM list_indexes('public.users', 'users_email_idx');
+
+-- List role memberships for a user
+SELECT * FROM list_memberships('authenticated');
 ```
 
-## Credits
+## Features
 
-Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46ee8da98a1efac218
+- Schema and entity name extraction from qualified identifiers
+- Database object introspection functions
+- Role membership verification
+- Index and constraint validation
+- Utility functions for database migrations and verification scripts
 
 ## Related LaunchQL Tooling
 
@@ -83,5 +88,4 @@ Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
-
 

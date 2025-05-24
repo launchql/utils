@@ -1,4 +1,4 @@
-# @launchql/ext-jobs-queue
+# @launchql/ext-jwt-claims
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/launchql/launchql/refs/heads/main/assets/outline-logo.svg" />
@@ -9,35 +9,42 @@
     <img height="20" src="https://github.com/launchql/utils/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/launchql/utils/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@launchql/ext-jobs-queue"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fjobs-simple%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@launchql/ext-jwt-claims"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fjwt-claims%2Fpackage.json"/></a>
 </p>
 
-A simplified asynchronous job queue schema for ACID compliant job creation through triggers/functions/etc. This PostgreSQL extension provides a lightweight job queue system for background processing.
+PostgreSQL extension for accessing JWT claims in database functions. This extension provides schemas and functions to access JWT token claims from within PostgreSQL, making it easy to implement authentication and authorization logic directly in your database.
 
 ## Usage
 
 ```sql
--- Create a job
-SELECT jobs_queue.add_job('my_job_type', json_build_object('key', 'value'));
+-- Access user ID from JWT claims
+SELECT ctx.user_id();
 
--- Process jobs
-SELECT jobs_queue.process_jobs();
+-- Access IP address from JWT claims
+SELECT ctx.ip_address();
 
--- Create a job with specific settings
-SELECT jobs_queue.add_job(
-  job_type => 'send_email',
-  payload => json_build_object('to', 'user@example.com', 'subject', 'Hello'),
-  max_attempts => 3,
-  run_at => now() + interval '1 minute'
-);
+-- Access user agent from JWT claims
+SELECT ctx.user_agent();
 
--- Query job status
-SELECT * FROM jobs_queue.jobs WHERE job_type = 'send_email';
+-- Access origin from JWT claims
+SELECT ctx.origin();
+
+-- Access database ID from JWT claims
+SELECT jwt_private.current_database_id();
+
+-- Access token ID from JWT claims
+SELECT jwt_private.current_token_id();
+
+-- Access IP address (public schema)
+SELECT jwt_public.current_ip_address();
 ```
 
-## Credits
+## Features
 
-Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46ee8da98a1efac218
+- Access JWT claims directly in SQL functions
+- Separate schemas for different access levels (ctx, jwt_private, jwt_public)
+- Proper permissions for authenticated and anonymous roles
+- Integration with PostgreSQL's `current_setting` for JWT claims
 
 ## Related LaunchQL Tooling
 
@@ -83,5 +90,4 @@ Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
-
 

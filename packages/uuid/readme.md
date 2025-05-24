@@ -1,4 +1,4 @@
-# @launchql/ext-jobs-queue
+# @launchql/ext-uuid
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/launchql/launchql/refs/heads/main/assets/outline-logo.svg" />
@@ -9,35 +9,48 @@
     <img height="20" src="https://github.com/launchql/utils/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/launchql/utils/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@launchql/ext-jobs-queue"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fjobs-simple%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@launchql/ext-uuid"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Fuuid%2Fpackage.json"/></a>
 </p>
 
-A simplified asynchronous job queue schema for ACID compliant job creation through triggers/functions/etc. This PostgreSQL extension provides a lightweight job queue system for background processing.
+UUID utilities for PostgreSQL that provide pseudo-ordered UUID generation with optional seeding, useful for multi-tenant scenarios and improved database performance.
+
+## Installation
+
+To install and deploy this utility with LaunchQL CLI:
+
+```bash
+npm install -g @launchql/cli
+
+cd /path/to/launchql/utils/uuid
+
+lql deploy \
+  --recursive \
+  --fast \
+  --createdb \
+  --yes \
+  --database mydb \
+  --project launchql-uuid
+```
 
 ## Usage
 
 ```sql
--- Create a job
-SELECT jobs_queue.add_job('my_job_type', json_build_object('key', 'value'));
+-- Generate a pseudo-ordered UUID
+SELECT uuids.pseudo_order_uuid();
 
--- Process jobs
-SELECT jobs_queue.process_jobs();
+-- Generate a pseudo-ordered UUID with a seed (good for multi-tenant scenarios)
+SELECT uuids.pseudo_order_seed_uuid('tenant-123');
 
--- Create a job with specific settings
-SELECT jobs_queue.add_job(
-  job_type => 'send_email',
-  payload => json_build_object('to', 'user@example.com', 'subject', 'Hello'),
-  max_attempts => 3,
-  run_at => now() + interval '1 minute'
-);
+-- Use in a trigger to set UUID based on a related field
+CREATE TRIGGER set_uuid_trigger
+BEFORE INSERT ON your_table
+FOR EACH ROW EXECUTE FUNCTION uuids.trigger_set_uuid_related_field();
 
--- Query job status
-SELECT * FROM jobs_queue.jobs WHERE job_type = 'send_email';
+-- Use in a trigger to set UUID with a specific seed
+CREATE TRIGGER set_uuid_seed_trigger
+BEFORE INSERT ON your_table
+FOR EACH ROW EXECUTE FUNCTION uuids.trigger_set_uuid_seed();
 ```
-
-## Credits
-
-Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46ee8da98a1efac218
 
 ## Related LaunchQL Tooling
 
@@ -83,5 +96,4 @@ Original author is Benjie Gillam https://gist.github.com/benjie/839740697f5a1c46
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
-
 
