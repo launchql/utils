@@ -14,6 +14,24 @@
 
 UUID utilities for PostgreSQL that provide pseudo-ordered UUID generation with optional seeding, useful for multi-tenant scenarios and improved database performance.
 
+## Installation
+
+To install and deploy this utility with LaunchQL CLI:
+
+```bash
+npm install -g @launchql/cli
+
+cd /path/to/launchql/utils/uuid
+
+lql deploy \
+  --recursive \
+  --fast \
+  --createdb \
+  --yes \
+  --database mydb \
+  --project launchql-uuid
+```
+
 ## Usage
 
 ```sql
@@ -33,6 +51,8 @@ CREATE TRIGGER set_uuid_seed_trigger
 BEFORE INSERT ON your_table
 FOR EACH ROW EXECUTE FUNCTION uuids.trigger_set_uuid_seed();
 ```
+
+## Related LaunchQL Tooling
 
 ### 🧪 Testing
 
@@ -76,3 +96,4 @@ FOR EACH ROW EXECUTE FUNCTION uuids.trigger_set_uuid_seed();
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
+

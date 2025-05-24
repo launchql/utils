@@ -52,6 +52,8 @@ UPDATE my_schema.my_table SET name = 'Updated Example' WHERE id = 1;
 - Integration with JWT claims for current user identification
 - Proper permission grants for authenticated and anonymous roles
 
+## Related LaunchQL Tooling
+
 ### 🧪 Testing
 
 * [launchql/pgsql-test](https://github.com/launchql/launchql/tree/main/packages/pgsql-test): **📊 Isolated testing environments** with per-test transaction rollbacks—ideal for integration tests, complex migrations, and RLS simulation.
@@ -94,3 +96,4 @@ UPDATE my_schema.my_table SET name = 'Updated Example' WHERE id = 1;
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
+

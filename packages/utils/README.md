@@ -12,35 +12,99 @@
    <a href="https://www.npmjs.com/package/@launchql/utils"><img height="20" src="https://img.shields.io/github/package-json/v/launchql/utils?filename=packages%2Futils%2Fpackage.json"/></a>
 </p>
 
-PostgreSQL extension providing utility functions for common database operations. This extension includes functions for bit manipulation, error handling, and other utility operations that are useful in PostgreSQL applications.
-
-## Usage
-
-```sql
--- Pad a bit string to a specific length
-SELECT utils.mask_pad('101', 8);
--- Result: '00000101'
-
--- Pad a varbit to a specific length
-SELECT utils.bitmask_pad('101'::varbit, 8);
--- Result: '00000101'::varbit
-
--- Create a trigger that throws an error
-CREATE TRIGGER prevent_delete
-BEFORE DELETE ON my_schema.my_table
-FOR EACH ROW EXECUTE PROCEDURE utils.throw('Deletion is not allowed');
-
--- The trigger will raise an exception with the specified message
-DELETE FROM my_schema.my_table WHERE id = 1;
--- Error: Deletion is not allowed (my_table)
-```
+A lightweight PostgreSQL utility extension providing helper functions for bitmask padding and custom trigger-based exceptions. Useful for schema consistency and low-level logic utilities in advanced database projects.
 
 ## Features
 
-- Bit manipulation functions for padding and masking
-- Error throwing trigger function with customizable messages
-- Public schema with permissions granted to all users
-- Simple, focused utility functions for common database operations
+* 🏗️ **Schema creation**: Automatically sets up a `utils` schema with sensible defaults.
+* 🧮 **Bitmask manipulation**:
+
+  * `utils.mask_pad`: Pads or trims a text-based bit string.
+  * `utils.bitmask_pad`: Same logic, but for PostgreSQL `VARBIT` types.
+* ⚠️ **Trigger error handler**:
+
+  * `utils.throw`: A customizable trigger function for raising exceptions, useful for debugging or enforcing logic constraints.
+
+## Installation
+
+To install and deploy this utility with LaunchQL CLI:
+
+```bash
+npm install -g @launchql/cli
+
+cd /path/to/launchql/utils/totp
+
+lql deploy \
+  --recursive \
+  --fast \
+  --createdb \
+  --yes \
+  --database mydb \
+  --project launchql-totp
+```
+
+## Usage
+
+### `utils.mask_pad(bitstr text, bitlen int, pad text DEFAULT '0') → text`
+
+**Purpose**:
+Pads a binary string (as text) on the left with a specified character (default `'0'`) to a given length, or truncates it from the left if it's longer than `bitlen`.
+
+**Example**:
+
+```sql
+SELECT utils.mask_pad('101', 6);         -- Returns '000101'
+SELECT utils.mask_pad('11110000', 4);    -- Returns '0000'
+SELECT utils.mask_pad('1', 3, 'x');      -- Returns 'xx1'
+```
+
+---
+
+### `utils.bitmask_pad(bitstr VARBIT, bitlen int, pad text DEFAULT '0') → VARBIT`
+
+**Purpose**:
+Same as `mask_pad`, but for native PostgreSQL `VARBIT` (variable-length bit string) values. Outputs a `VARBIT` result.
+
+**Example**:
+
+```sql
+SELECT utils.bitmask_pad(B'101', 6);          -- Returns B'000101'
+SELECT utils.bitmask_pad(B'11110000', 4);     -- Returns B'0000'
+SELECT utils.bitmask_pad(B'1', 3, '1');       -- Returns B'111'
+```
+
+---
+
+### `utils.throw() → TRIGGER`
+
+**Purpose**:
+Custom trigger function that raises an exception when triggered. Useful for enforcing invariants, debugging, or intentional operation blocking.
+
+**Trigger Arguments**:
+
+* If **1 argument**: it becomes the error message.
+* If **2 arguments**: both are included in the error.
+* If **0 or more than 2**: default fallback message.
+
+**Example**:
+
+```sql
+-- Example table
+CREATE TABLE protected_actions (
+  id serial PRIMARY KEY,
+  action text
+);
+
+-- Add trigger to block inserts with custom message
+CREATE TRIGGER block_insert
+BEFORE INSERT ON protected_actions
+FOR EACH ROW EXECUTE FUNCTION utils.throw('Insert operation blocked');
+
+-- Attempting to insert will now raise an exception:
+-- ERROR:  Insert operation blocked (protected_actions)
+```
+
+## Related LaunchQL Tooling
 
 ### 🧪 Testing
 
@@ -84,3 +148,4 @@ DELETE FROM my_schema.my_table WHERE id = 1;
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
+
