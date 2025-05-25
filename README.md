@@ -65,15 +65,6 @@ lql deploy \
   --project launchql-base32
 ```
 
-### Deploy All Extensions
-
-You can also deploy all modules utilizing versioning as Sqitch modules:
-
-```sh
-# Remove --createdb if you already created your database
-lql deploy awesome-db --yes --recursive --createdb
-```
-
 ## Available Extensions
 
 LaunchQL Utils includes the following PostgreSQL extensions:
@@ -99,56 +90,6 @@ LaunchQL Utils includes the following PostgreSQL extensions:
 | [stamps](packages/stamps) | Timestamp utilities and tracking |
 
 Each extension can be installed individually or as part of a complete deployment.
-
-## Development
-
-### Module Installation
-
-Install all module dependencies:
-
-```sh
-yarn install
-```
-
-### Testing
-
-Testing will load all your latest SQL changes and create fresh, populated databases for each Sqitch module in `packages/`:
-
-```sh
-yarn test:watch
-```
-
-### Building New Modules
-
-Create a new folder in `packages/`:
-
-```sh
-lql init
-```
-
-Then, run a generator:
-
-```sh
-lql generate
-```
-
-You can also add arguments if you already know what you want to do:
-
-```sh
-lql generate schema --schema myschema
-lql generate table --schema myschema --table mytable
-```
-
-### Deploy Code as Extensions
-
-To package a module as an extension:
-
-```sh
-cd packages/<module>
-lql package
-```
-
-This will create an SQL file in `packages/<module>/sql/` used for `CREATE EXTENSION` calls to install your Sqitch module as an extension.
 
 ## Related LaunchQL Tooling
 
